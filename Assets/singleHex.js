@@ -63,7 +63,7 @@ function Start (){
 	var rob : robot;
 	rob = robot.makeRobot(this);
 	rob.setColor(0);
-	rob.setPosition(0, 0);
+	rob.setPosition(4, 4);
 	rob.gameObject.AddComponent(MouseDelegate);
 	
 	rob.transform.parent = shipLayer.transform;
@@ -75,7 +75,7 @@ function Start (){
 	
 	rob = robot.makeRobot(this);
 	rob.setColor(1);
-	rob.setPosition(10, 10);
+	rob.setPosition(6, 6);
 	rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
@@ -94,6 +94,93 @@ function realDistance(x0 : int, y0 : int, x1 : int, y1 : int) : int {
 	if(y1 > y0)
 		return x1-x0+y1-y0;
 	return Mathf.FloorToInt(Mathf.Max(x1-x0, y0-y1));
+}
+
+function normalToAffine(x : int, y : int, outValue : Array) {
+	outValue[0] = Mathf.FloorToInt(x-y/2.0);
+	outValue[1] = y;
+}
+function affineToNormal(x : int, y : int, outValue : Array) {
+	outValue[0] = Mathf.CeilToInt(x+y/2.0);
+	outValue[1] = y;
+}
+//affine coordinate
+//shortest path exist
+function realPathLength(x0 : int, y0 : int, x1 : int, y1 : int) : boolean {
+	var difx = x1-x0;
+	var dify = y1-y0;
+	var i : int;
+	var dx : int;
+	var dy : int;
+	
+	var disA : boolean = false;
+	var disB : boolean = false;
+	
+	if(difx == 0 && dify == 0) {
+		return true;
+	}
+	if(difx == -1 && dify == 1)
+		return true;
+	if(difx == 1 && dify == -1)
+		return true;
+	if(difx == 0 && Mathf.Abs(dify) == 1)
+		return true;
+	if(dify == 0 && Mathf.Abs(difx) == 1)
+		return true;
+	
+	if(difx == 0) {
+		if(dify > 0) {
+			if(boardMap[x0*1000+y0+1] == null)
+				return realPathLength(x0, y0+1, x1, y1);
+			return false;
+		} else if(dify < 0) {
+			if(boardMap[x0*1000+y0-1] == null)
+				return realPathLength(x0, y0-1, x1, y1);
+		}
+		return false;
+	}
+	if(dify == 0) {
+		if(difx > 0) {
+			if(boardMap[(x0+1)*1000+y0] == null)
+				return realPathLength(x0+1, y0, x1, y1);
+			return false;
+		} else if(difx < 0) {
+			if(boardMap[(x0-1)*1000+y0] == null)
+				return realPathLength(x0-1, y0, x1, y1);
+		}
+		return false;
+	}
+	
+	
+	if(difx > 0 && dify < 0) {
+		if(boardMap[x0*1000+y0-1] == null)
+			disA = realPathLength(x0, y0-1, x1, y1);
+		if(boardMap[(x0+1)*1000+y0-1] == null)
+			disB = realPathLength(x0+1, y0-1, x1, y1);
+		return disA || disB;
+	}
+	if(difx < 0 && dify > 0) {
+		if(boardMap[(x0-1)*1000+y0+1] == null)
+			disA = realPathLength(x0-1, y0+1, x1, y1);
+		if(boardMap[x0*1000+y0+1] == null)
+			disB = realPathLength(x0, y0+1, x1, y1);
+		return disA || disB;
+	}
+	if(difx > 0 && dify > 0) {
+		if(boardMap[(x0+1)*1000+y0] == null)
+			disA = realPathLength(x0+1, y0, x1, y1);
+		if(boardMap[x0*1000+y0+1] == null)
+			disB = realPathLength(x0, y0+1, x1, y1);
+		return disA || disB;
+	}
+	if(difx < 0 && dify < 0) {
+		if(boardMap[(x0-1)*1000+y0] == null)
+			disA = realPathLength(x0-1, y0, x1, y1);
+		if(boardMap[x0*1000+y0-1] == null)
+			disB = realPathLength(x0, y0-1, x1, y1);
+		return disA || disB;
+	}
+	return false;
 }
 
 
@@ -118,6 +205,7 @@ function gridToPos(row : int, col : int) {
 		return new Vector3(col*2*r+r, 0, row*(s+h));
 	}
 }
+
 //six block
 function posToGrid(x : float, z : float) {
 	var gx : int = Mathf.FloorToInt(x/2/r); 
