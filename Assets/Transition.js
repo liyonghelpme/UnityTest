@@ -1,8 +1,8 @@
 #pragma strict
 class Transition {
-	var targetState : StateModel;
+	var targetState : String;
 	var trigger : Function;
-	function Transition(t : StateModel, tri : Function) {
+	function Transition(t : String, tri : Function) {
 		targetState = t;
 		trigger = tri;
 	}

@@ -10,9 +10,9 @@ class StateModel{
 		stateName = n;
 	}	
 	
-	function enter() {
+	virtual function enter() {
 	}
-	function exit() {
+	virtual function exit() {
 	}
 	function update() {
 		for(var t : Transition in transitionArray) {
@@ -26,8 +26,8 @@ class StateModel{
 	virtual function realUpdate() {
 	}
 	function addTransition(target : String, trigger : Function) {
-		var tar : StateModel = stateMachine.getState(target);
-		transitionArray.Push(new Transition(tar, trigger));
+		//var tar : StateModel = stateMachine.getState(target);
+		transitionArray.Push(new Transition(target, trigger));
 	}
 	virtual function initTransition() {
 	}

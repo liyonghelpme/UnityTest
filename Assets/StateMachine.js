@@ -12,17 +12,21 @@ class StateMachine {
 			return;
 		currentState.update();
 	}
-	
+	function initTransition() {
+		for(var s : StateModel in stateArray) {
+			s.initTransition();
+		}
+	}
 	function addState(state : StateModel) {
 		stateArray.Push(state);
 	}
-	function changeState(state : StateModel) {
+	function changeState(nextState : String) {
 		if(currentState != null) {
 			currentState.exit();
 			currentState = null;
 		}
 		
-		currentState = state;
+		currentState = getState(nextState);
 		currentState.enter();
 	}
 	function getState(n : String) {
