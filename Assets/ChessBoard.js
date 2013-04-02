@@ -52,17 +52,17 @@ function OnMouseDown() {
 	}
 	startChessPos = transform.localPosition; 
 	
-	Debug.Log("down mouse ");
+	//Debug.Log("down mouse ");
 }
 function OnMouseUp() {
-	Debug.Log("OnMouseUp");
+	//Debug.Log("OnMouseUp");
 }
 function OnMouseDrag() {
 	
 	var ray : Ray = Camera.mainCamera.ScreenPointToRay(Input.mousePosition);
 	var dist : float;
 	var inter : boolean = plane.Raycast(ray, dist);
-	Debug.Log("drag mouse "+dist+"inter"+inter);
+	//Debug.Log("drag mouse "+dist+"inter"+inter);
 	if(inter) {
 		var curPos = ray.GetPoint(dist);
 		var dif : Vector3 = curPos-startWorldPos;

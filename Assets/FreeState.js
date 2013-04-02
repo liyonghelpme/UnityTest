@@ -5,18 +5,33 @@ class FreeState extends StateModel {
 		
 	function FreeState (e : StateMachine, o : robot) {
 		super(e, "Free");
-		//addTransition(new MoveState(e), goMove);
 		object = o;
 	}
 	function goMove() {
-		return false;
+		return object.inMove;
+	}
+	function goInAttack() {
+		return object.inAttackRange;
 	}
 	virtual function realUpdate() {
 		var old = object.transform.localPosition;
 		object.transform.localPosition = Vector3(old.x, Mathf.Sin(Time.time-startTime), old.z);
 	}
+	function goInChoose() {
+		return object.chooseYet;
+	}
+	function goAttack() {
+		return object.attacking;
+	}
+	function goDead() {
+		return object.health <= 0;
+	}
 	virtual function initTransition() {
-		addTransition("Move", goMove);
+		//addTransition("Move", goMove);
+		addTransition("InAttack", goInAttack);
+		addTransition("InChoose", goInChoose);
+		addTransition("Attack", goAttack);
+		addTransition("Dead", goDead);
 	}
 	virtual function enter() {
 		startTime = Time.time;

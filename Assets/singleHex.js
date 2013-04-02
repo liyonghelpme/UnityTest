@@ -156,7 +156,7 @@ function checkPosPassable(nx : int, ny : int, color : int) {
 function realPathLength(x0 : int, y0 : int, x1 : int, y1 : int, path : Array, attacker : robot) : boolean {
 	var difx = x1-x0;
 	var dify = y1-y0;
-	Debug.Log("check Path"+difx+" dy "+dify + " path "+path);
+	//Debug.Log("check Path"+difx+" dy "+dify + " path "+path);
 	
 	if(difx < 0)
 		return realPathLength(x1, y1, x0, y0, path, attacker);

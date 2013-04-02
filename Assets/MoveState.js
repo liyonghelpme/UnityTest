@@ -16,7 +16,7 @@ class MoveState extends StateModel {
 	virtual function initTransition() {
 		addTransition("Free", goFree);
 	}
-	//
+	
 	virtual function enter() {	
 		movePath = object.movePath;
 		moveStep = 0;
@@ -25,6 +25,8 @@ class MoveState extends StateModel {
 	}
 	virtual function exit() {
 		object.updateMap();
+		object.inMove = false;
+		object.logic.switchTurn();
 	}
 	virtual function realUpdate() {
 		//if near target position stop and change target

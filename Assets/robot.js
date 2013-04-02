@@ -1,47 +1,53 @@
 #pragma strict
-
-var color : int;
-var board : singleHex;
-var moveRange : int;
-var moveGrid : GameObject;
-var box : GameObject;
-var target : Vector3;
-var smooth : float;
-var logic : ChessBoard;
-var attackRange : int;
-var myGridX : int;
-var myGridZ : int;
-
-var oldColor : Color;
-var attackType : int;
-
-//show number 
-var health : int;
-var attack : int;
-var stateMachine : StateMachine;
-
 //@script RequireComponent(StateMachine)
 class robot extends MonoBehaviour {
+	var color : int;
+	var board : singleHex;
+	var moveRange : int;
+	var moveGrid : GameObject;
+	var box : GameObject;
+	//var target : Vector3;
+	var smooth : float;
+	var logic : ChessBoard;
+	var attackRange : int;
+	var myGridX : int;
+	var myGridZ : int;
+	var inAttack : boolean;
+	var inMove : boolean;
+	var attacking : boolean;
+	
+	//var oldColor : Color;
+	var attackType : int;
+	
+	//show number 
+	var health : int;
+	var attack : int;
+	var stateMachine : StateMachine;
+	var inDead : boolean;
+
 	function Start () {
 		logic = board.board.GetComponent(ChessBoard);
+		fontStyle = new GUIStyle();
 		smooth = 5.0;
-		target = transform.localPosition;
+		//target = transform.localPosition;
 		inAttackRange = false;
-		//inMove = false;
+		inAttack = false;
+		inMove = false;
+		inDead = false;
 		health = 100;
 		attack = 30;
-		fontStyle = new GUIStyle();
-		
 		initStateMachine();
 	}
-	function initStateMachine() {
+	virtual function initStateMachine() {
 		stateMachine = new StateMachine();
 		var free : StateModel = new FreeState(stateMachine, this);
 		stateMachine.addState(free);
 		var move : StateModel = new MoveState(stateMachine, this);
 		stateMachine.addState(move);
-		//free.initTransition();
-		//move.initTransition();
+		stateMachine.addState(new InAttack(stateMachine, this));
+		stateMachine.addState(new InChooseState(stateMachine, this));
+		stateMachine.addState(new AttackState(stateMachine, this));
+		stateMachine.addState(new DeadState(stateMachine, this));
 		stateMachine.initTransition();
 		
 		stateMachine.setCurrentState("Free");
@@ -54,7 +60,7 @@ class robot extends MonoBehaviour {
 		var b = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		b.transform.parent = go.transform;
 		go.AddComponent(robot);
-		go.AddComponent(StateMachine);
+		
 		var r = go.GetComponent(robot);
 		r.board = s;
 		r.moveRange = 2;
@@ -71,16 +77,18 @@ class robot extends MonoBehaviour {
 			box.renderer.material.color = Color.red;
 		else
 			box.renderer.material.color = Color.blue;
-		oldColor = box.renderer.material.color;
+		//oldColor = box.renderer.material.color;
 	}
 	function changeChoose() {
 		if(chooseYet) {
 			chooseYet = false;
-			removeMoveGrid();
+			//removeMoveGrid();
 		}
 		if(inAttackRange) {
+			Debug.Log("inAttackRange exit");
 			inAttackRange = false;
-			box.renderer.material.color = oldColor;
+			//stateMachine.changeState("Free");
+			//box.renderer.material.color = oldColor;
 		}
 		if(attackLayer != null) {
 			Destroy(attackLayer);
@@ -94,20 +102,24 @@ class robot extends MonoBehaviour {
 	}
 	function myMouseDown() {
 	}
+	var enemy : robot;
 	function startAttack(enemyObject : robot) {
-		board.changeChoose();
-		chooseYet = true;
-		enemyObject.health -= attack;
+		//board.changeChoose();
+		enemy = enemyObject;
+		chooseYet = false;
+		attacking = true;
+		
+		//enemyObject.health -= attack;
 	}
 	function myMouseUp() {
 		if(inAttackRange) {
 			attackObject.startAttack(this);
 			inAttackRange = false;
 		} else {
-			board.changeChoose();
+			//board.changeChoose();
 			chooseYet = true;
-			showMoveGrid();
-			board.shipLayer.BroadcastMessage("checkAttackable", this);
+			//showMoveGrid();
+			//board.shipLayer.BroadcastMessage("checkAttackable", this);
 		}
 	}
 	function myMouseDrag() {
@@ -145,6 +157,12 @@ class robot extends MonoBehaviour {
 		board.clearMap(grid.x, grid.z, this);
 		setMapYet = false;
 	}
+	function clearAttackable(attacker : robot) {
+		if(inAttackRange && attackObject == attacker) {
+			inAttackRange = false;
+			attackObject = null;
+		}
+	}
 	var inAttackRange : boolean;
 	var attackLayer : GameObject;
 	var attackObject : robot;
@@ -152,7 +170,7 @@ class robot extends MonoBehaviour {
 		Debug.Log("checkAttackble "+attacker.color+" "+color);
 		if(color != attacker.color) {
 			var dist : int = board.minDistance(myGridX, myGridZ, attacker.myGridX, attacker.myGridZ);
-			Debug.Log("min dist "+dist+" range"+attacker.attackRange);
+			//Debug.Log("min dist "+dist+" range"+attacker.attackRange);
 			if(dist <= attacker.attackRange) {
 				var mx : int;
 				var mz : int;
@@ -167,17 +185,18 @@ class robot extends MonoBehaviour {
 				board.normalToAffine(attacker.myGridX, attacker.myGridZ, arr);
 				ax = arr[0];
 				az = arr[1];
-				Debug.Log("affine pos "+mx+" "+mz+" "+ax+" "+az);
+				//Debug.Log("affine pos "+mx+" "+mz+" "+ax+" "+az);
 				
 				var path = new Array();
 				var ret : boolean = board.realPathLength(mx, mz, ax, az, path, attacker);
-				Debug.Log("realPathLength "+ret);
+				//Debug.Log("realPathLength "+ret);
 				if(ret) {
 					inAttackRange = true;
 					attackObject = attacker;
+					//stateMachine.changeState("InAttack");
 				}
-				Debug.Log("path length "+path.length);
-				Debug.Log("path is "+path);
+				//Debug.Log("path length "+path.length);
+				//Debug.Log("path is "+path);
 				attackLayer = new GameObject();
 				attackLayer.transform.parent = transform.parent;
 				attackLayer.transform.localPosition = Vector3.zero;
@@ -273,15 +292,14 @@ class robot extends MonoBehaviour {
 		var grid = board.posToGrid(p.x, p.z);
 		var path = findMovePath(grid.x, grid.z);
 		movePath = path;
-		//inMove = true;
+		inMove = true;
 		//moveStep = 0;
 		//target = p;
-		
-		changeChoose();
-		logic.switchTurn();
+		//board.changeChoose();
+		//logic.switchTurn();
 		//clearMap();
 		
-		stateMachine.changeState("Move");
+		//stateMachine.changeState("Move");
 	}
 	
 	function Update () {
@@ -524,5 +542,7 @@ class robot extends MonoBehaviour {
 		}
 		return closedList.Keys;
 	}
-
+	function changeHealth(c : int) {
+		health += c;
+	}
 }
