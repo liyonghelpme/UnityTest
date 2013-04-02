@@ -34,6 +34,15 @@ function Start () {
 	for(var c in ppp.Keys) {
 		Debug.Log(c);
 	}
+	
+	var si = new singleHex();
+	var arr = new Array();
+	arr.length = 2;
+	var brr = new Array();
+	brr.length = 2;
+	si.affineToNormal(4, 4, arr);
+	si.normalToAffine(arr[0], arr[1], brr);
+	Debug.Log("arr brr "+arr+" "+brr);
 }
 
 function Update () {

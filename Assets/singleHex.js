@@ -11,6 +11,7 @@ var ships : Array;
 var shipLayer : GameObject;
 
 var boardMap : Hashtable;
+var stateStack : Array;
 function updateMap(x : int, y : int, obj : robot) {
 	boardMap.Add(x*1000+y, obj);
 }
@@ -19,6 +20,7 @@ function clearMap(x : int, y : int, obj : robot) {
 }
 
 function Start (){
+	stateStack = new Array();
 	ships = new Array();
 	boardMap = new Hashtable();
 	
@@ -81,6 +83,47 @@ function Start (){
 	ships.push(rob);
 	rob.updateMap();
 	
+	rob = robot.makeRobot(this);
+	rob.setColor(0);
+	rob.setPosition(4, 5);
+	rob.gameObject.AddComponent(MouseDelegate);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	
+	rob = robot.makeRobot(this);
+	rob.setColor(1);
+	rob.setPosition(5, 4);
+	rob.gameObject.AddComponent(MouseDelegate);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	rob = robot.makeRobot(this);
+	rob.setColor(1);
+	rob.setPosition(4, 3);
+	rob.gameObject.AddComponent(MouseDelegate);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	rob = robot.makeRobot(this);
+	rob.setColor(1);
+	rob.setPosition(3, 3);
+	rob.gameObject.AddComponent(MouseDelegate);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();	
+	
+	rob = robot.makeRobot(this);
+	rob.setColor(1);
+	rob.setPosition(3, 4);
+	rob.gameObject.AddComponent(MouseDelegate);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
 }
 //https://groups.google.com/forum/?fromgroups=#!topic/rec.games.design/-5n_Km1SqWc
 function minDistance(x0 : int, y0 : int, x1 : int, y1 : int) {
@@ -97,18 +140,28 @@ function realDistance(x0 : int, y0 : int, x1 : int, y1 : int) : int {
 }
 
 function normalToAffine(x : int, y : int, outValue : Array) {
-	outValue[0] = Mathf.FloorToInt(x-y/2.0);
+	outValue[0] = x-y/2;
 	outValue[1] = y;
 }
 function affineToNormal(x : int, y : int, outValue : Array) {
-	outValue[0] = Mathf.CeilToInt(x+y/2.0);
+	outValue[0] = x+y/2;
 	outValue[1] = y;
 }
 //affine coordinate
 //shortest path exist
-function realPathLength(x0 : int, y0 : int, x1 : int, y1 : int) : boolean {
+function checkPosPassable(nx : int, ny : int, color : int) {
+	return boardMap[nx*1000+ny] == null || (boardMap[nx*1000+ny] as robot).color == color;
+}
+//use normal coordinate to check boardMap
+function realPathLength(x0 : int, y0 : int, x1 : int, y1 : int, path : Array, attacker : robot) : boolean {
 	var difx = x1-x0;
 	var dify = y1-y0;
+	Debug.Log("check Path"+difx+" dy "+dify + " path "+path);
+	
+	if(difx < 0)
+		return realPathLength(x1, y1, x0, y0, path, attacker);
+	
+	
 	var i : int;
 	var dx : int;
 	var dy : int;
@@ -116,11 +169,11 @@ function realPathLength(x0 : int, y0 : int, x1 : int, y1 : int) : boolean {
 	var disA : boolean = false;
 	var disB : boolean = false;
 	
+	//difx > 0
+	
 	if(difx == 0 && dify == 0) {
 		return true;
 	}
-	if(difx == -1 && dify == 1)
-		return true;
 	if(difx == 1 && dify == -1)
 		return true;
 	if(difx == 0 && Mathf.Abs(dify) == 1)
@@ -128,58 +181,99 @@ function realPathLength(x0 : int, y0 : int, x1 : int, y1 : int) : boolean {
 	if(dify == 0 && Mathf.Abs(difx) == 1)
 		return true;
 	
+	var nx : int;
+	var ny : int;
+	var arr : Array = new Array();
+	arr.length = 2;
+	//x0 y0+1
+	//x0 y0-1
+	//x0+1 y0
+	//x0-1 y0
+	//x0 y0-1
+	//x0+1 y0-1
+	//x0-1 y0+1
+	//x0 y0+1
+	//
+	
+	
 	if(difx == 0) {
 		if(dify > 0) {
-			if(boardMap[x0*1000+y0+1] == null)
-				return realPathLength(x0, y0+1, x1, y1);
+			affineToNormal(x0, y0+1, arr);
+			
+			nx = arr[0];
+			ny = arr[1];		
+			Debug.Log("x0 y >" +x0+" "+(y0+1)+" "+arr);
+			if(checkPosPassable(nx, ny, attacker.color)) {
+				path.Push(Array(nx, ny));
+				return realPathLength(x0, y0+1, x1, y1, path, attacker);
+			}
 			return false;
 		} else if(dify < 0) {
-			if(boardMap[x0*1000+y0-1] == null)
-				return realPathLength(x0, y0-1, x1, y1);
+			affineToNormal(x0, y0-1, arr);
+			nx = arr[0];
+			ny = arr[1];
+			if(checkPosPassable(nx, ny, attacker.color)) {
+				path.Push(Array(nx, ny));
+				return realPathLength(x0, y0-1, x1, y1, path, attacker);
+			}
 		}
 		return false;
 	}
 	if(dify == 0) {
-		if(difx > 0) {
-			if(boardMap[(x0+1)*1000+y0] == null)
-				return realPathLength(x0+1, y0, x1, y1);
-			return false;
-		} else if(difx < 0) {
-			if(boardMap[(x0-1)*1000+y0] == null)
-				return realPathLength(x0-1, y0, x1, y1);
+		affineToNormal(x0+1, y0, arr);
+		nx = arr[0];
+		ny = arr[1];
+		if(checkPosPassable(nx, ny, attacker.color)) {
+			path.Push(Array(nx, ny));
+			return realPathLength(x0+1, y0, x1, y1, path, attacker);
 		}
 		return false;
 	}
 	
 	
 	if(difx > 0 && dify < 0) {
-		if(boardMap[x0*1000+y0-1] == null)
-			disA = realPathLength(x0, y0-1, x1, y1);
-		if(boardMap[(x0+1)*1000+y0-1] == null)
-			disB = realPathLength(x0+1, y0-1, x1, y1);
+		affineToNormal(x0, y0-1, arr);
+		nx = arr[0];
+		ny = arr[1];
+		if(checkPosPassable(nx, ny, attacker.color)) {
+			path.Push(Array(nx, ny));
+			disA = realPathLength(x0, y0-1, x1, y1, path, attacker);
+		}
+		if(disA)
+			return disA;
+		affineToNormal(x0+1, y0-1, arr);
+		nx = arr[0];
+		ny = arr[1];
+		if(checkPosPassable(nx, ny, attacker.color)) {
+			path.Push(Array(nx, ny));
+			disB = realPathLength(x0+1, y0-1, x1, y1, path, attacker);
+		}
 		return disA || disB;
 	}
-	if(difx < 0 && dify > 0) {
-		if(boardMap[(x0-1)*1000+y0+1] == null)
-			disA = realPathLength(x0-1, y0+1, x1, y1);
-		if(boardMap[x0*1000+y0+1] == null)
-			disB = realPathLength(x0, y0+1, x1, y1);
-		return disA || disB;
-	}
+	
 	if(difx > 0 && dify > 0) {
-		if(boardMap[(x0+1)*1000+y0] == null)
-			disA = realPathLength(x0+1, y0, x1, y1);
-		if(boardMap[x0*1000+y0+1] == null)
-			disB = realPathLength(x0, y0+1, x1, y1);
+		affineToNormal(x0+1, y0, arr);
+		nx = arr[0];
+		ny = arr[1];
+		
+		if(checkPosPassable(nx, ny, attacker.color)) {
+			path.Push(Array(nx, ny));
+			disA = realPathLength(x0+1, y0, x1, y1, path, attacker);
+		}
+		if(disA)
+			return disA;
+			
+		affineToNormal(x0, y0+1, arr);
+		nx = arr[0];
+		ny = arr[1];
+		
+		if(checkPosPassable(nx, ny, attacker.color)) {
+			path.Push(Array(nx, ny));
+			disB = realPathLength(x0, y0+1, x1, y1, path, attacker);
+		}
 		return disA || disB;
 	}
-	if(difx < 0 && dify < 0) {
-		if(boardMap[(x0-1)*1000+y0] == null)
-			disA = realPathLength(x0-1, y0, x1, y1);
-		if(boardMap[x0*1000+y0-1] == null)
-			disB = realPathLength(x0, y0-1, x1, y1);
-		return disA || disB;
-	}
+	
 	return false;
 }
 
@@ -189,7 +283,7 @@ function update() {
 
 }
 
-//move 
+//move  
 function FixedUpdate() {
 	
 }
