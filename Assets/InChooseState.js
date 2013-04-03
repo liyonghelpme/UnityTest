@@ -9,18 +9,14 @@ class InChooseState extends StateModel {
 		object.board.changeChoose();
 		object.chooseYet = true;
 		object.showMoveGrid();
-		object.board.shipLayer.BroadcastMessage("checkAttackable", object);
-		//object.findAttackable();
+		object.findAttackable();
 	}
 	virtual function exit() {
 		object.removeMoveGrid();
 		object.box.renderer.material.color.g = 0;
 		object.chooseYet = false;//doMove
 		//doFree clear old choose objects!
-		object.board.shipLayer.BroadcastMessage("clearAttackable", object);//clear my enemy
-		//inform my attackable object clear their state 
-		//object.board.changeChoose();
-		//object.clearAttackable();
+		object.clearEnemy();
 	}
 	virtual function realUpdate() {
 		var oldColor = object.box.renderer.material.color;
@@ -35,9 +31,13 @@ class InChooseState extends StateModel {
 	function goAttack() {
 		return object.attacking;
 	}
+	function goReplace() {
+		return object.inReplace;
+	}
 	virtual function initTransition() {
 		addTransition("Free", goFree);
 		addTransition("Move", goMove);
 		addTransition("Attack", goAttack);
+		addTransition("Replace", goReplace);
 	}
 }

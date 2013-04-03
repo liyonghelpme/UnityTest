@@ -42,7 +42,6 @@ class robot extends MonoBehaviour {
 		inDead = false;
 		inKnockBack = false;
 		inReplace = false;
-		replaceable = false;
 		chooseYet = false;
 		
 		health = 100;
@@ -124,22 +123,13 @@ class robot extends MonoBehaviour {
 	}
 	var enemy : robot;
 	var other : robot;
-	function startReplace(o : robot) {
-		other = o;
-		inReplace = true;
-	}
-	function startAttack(enemyObject : robot) {
+	
+	virtual function startAttack(enemyObject : robot) {
 		enemy = enemyObject;
-		chooseYet = false;
 		attacking = true;
 	}
-	function myMouseUp() {
-		 
-		if(replaceable) {
-			replacer.startReplace(this);
-			startReplace(replacer);//self replace other replace
-			replaceable = false;
-		} else if(inAttackRange) {
+	function myMouseUp() { 
+		if(inAttackRange) {
 			attackObject.startAttack(this);
 			inAttackRange = false;
 		} else {
@@ -194,20 +184,7 @@ class robot extends MonoBehaviour {
 			attackObject = null;
 		}
 	}
-	var replacer : robot;
-	var replaceable : boolean;
-	function checkReplaceable(from : robot) {
-		if(color == from.color) {
-			replacer = from;
-			replaceable = true;
-		}
-	}
-	function clearReplaceable(from : robot) {
-		if(replaceable && replacer == from) {
-			replacer = null;
-			replaceable = false;
-		}
-	}
+	
 	//similar to checkReplacable 
 	//same check different action
 	//distance limit 
@@ -271,54 +248,6 @@ class robot extends MonoBehaviour {
 	var inAttackRange : boolean;
 	var attackLayer : GameObject;
 	var attackObject : robot;
-	function checkAttackable(attacker : robot) {
-		//Debug.Log("checkAttackble "+attacker.color+" "+color);
-		if(color != attacker.color) {
-			var dist : int = board.minDistance(myGridX, myGridZ, attacker.myGridX, attacker.myGridZ);
-			//Debug.Log("min dist "+dist+" range"+attacker.attackRange);
-			if(dist <= attacker.attackRange) {
-				var mx : int;
-				var mz : int;
-				var ax : int;
-				var az : int;
-				var arr = new Array();
-				arr.length = 2;
-				
-				board.normalToAffine(myGridX, myGridZ, arr);
-				mx = arr[0];
-				mz = arr[1];
-				board.normalToAffine(attacker.myGridX, attacker.myGridZ, arr);
-				ax = arr[0];
-				az = arr[1];
-				//Debug.Log("affine pos "+mx+" "+mz+" "+ax+" "+az);
-				
-				var path = new Array();
-				var ret : boolean = board.realPathLength(mx, mz, ax, az, path, attacker);
-				//Debug.Log("realPathLength "+ret);
-				if(ret) {
-					inAttackRange = true;
-					attackObject = attacker;
-					//stateMachine.changeState("InAttack");
-				}
-				//Debug.Log("path length "+path.length);
-				//Debug.Log("path is "+path);
-				attackLayer = new GameObject();
-				attackLayer.transform.parent = transform.parent;
-				attackLayer.transform.localPosition = Vector3.zero;
-				
-				
-				for(var c : Array in path) {
-					var hint = GameObject.CreatePrimitive(PrimitiveType.Cube);
-					hint.transform.parent = attackLayer.transform;
-					hint.transform.localScale = Vector3(0.3, 0.3, 0.3);
-					hint.transform.localPosition = board.gridToPos(c[1], c[0]);
-					hint.renderer.material.color = Color.green;
-				}
-				
-				
-			} 
-		}
-	}
 	
 	
 	function showMoveGrid() {

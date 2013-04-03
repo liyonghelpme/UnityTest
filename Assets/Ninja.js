@@ -2,7 +2,7 @@
 class Ninja extends robot {
 	virtual function initPrivateState() {
 		stateMachine.addState(new NinjaAttack(stateMachine, this));
-		stateMachine.addState(new NinjaChoose(stateMachine, this));
+		//stateMachine.addState(new NinjaChoose(stateMachine, this));
 		stateMachine.initTransition();
 		stateMachine.setCurrentState("Free");
 	}
@@ -19,5 +19,29 @@ class Ninja extends robot {
 		r.box = b;
 		r.attackType = 2;
 		return r;
+	}
+	//attack
+	//replace
+	virtual function findAttackable() {
+		super.findAttackable();
+		for(var r : robot in board.ships) {
+			if(r.color == color) {
+				r.inAttackRange = true;
+				r.attackObject = this;
+				attackableList.Push(r);
+			}
+		}
+	}
+	virtual function startAttack(enemyObject : robot) {
+		if(enemyObject.color == color) {
+			inReplace = true;
+			other = enemyObject;
+			
+			enemyObject.inReplace = true;
+			enemyObject.other = this;
+		} else {
+			attacking = true;
+			enemy = enemyObject;
+		}
 	}
 } 
