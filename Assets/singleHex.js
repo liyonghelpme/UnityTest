@@ -94,7 +94,7 @@ function Start (){
 	
 	rob = robot.makeRobot(this);
 	rob.setColor(1);
-	rob.setPosition(5, 4);
+	rob.setPosition(5, 5);
 	rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
@@ -108,7 +108,7 @@ function Start (){
 	ships.push(rob);
 	rob.updateMap();
 	
-	rob = robot.makeRobot(this);
+	rob = Ninja.makeRobot(this);
 	rob.setColor(1);
 	rob.setPosition(3, 3);
 	rob.gameObject.AddComponent(MouseDelegate);
@@ -116,7 +116,7 @@ function Start (){
 	ships.push(rob);
 	rob.updateMap();	
 	
-	rob = robot.makeRobot(this);
+	rob = Knight.makeRobot(this);
 	rob.setColor(1);
 	rob.setPosition(3, 4);
 	rob.gameObject.AddComponent(MouseDelegate);
@@ -151,6 +151,9 @@ function affineToNormal(x : int, y : int, outValue : Array) {
 //shortest path exist
 function checkPosPassable(nx : int, ny : int, color : int) {
 	return boardMap[nx*1000+ny] == null || (boardMap[nx*1000+ny] as robot).color == color;
+}
+function checkMapMovable(nx : int, ny : int) {
+	return boardMap[nx*1000+ny] == null;
 }
 //use normal coordinate to check boardMap
 function realPathLength(x0 : int, y0 : int, x1 : int, y1 : int, path : Array, attacker : robot) : boolean {

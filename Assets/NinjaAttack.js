@@ -1,24 +1,17 @@
 #pragma strict
-class KnightAttack extends StateModel {
+class NinjaAttack extends StateModel {
 	var object : robot;
 	var enemy : robot;
 	var startTime : float;
 	var dir : Vector3;
 	var startPos : Vector3;
 	var endPos : Vector3;
-	function KnightAttack(en : StateMachine, o : robot) {
+	
+	function NinjaAttack(en : StateMachine, o : robot) {
 		super(en, "Attack");
 		object = o;
 	}
-	virtual function realUpdate() {
-		var passTime : float = Time.time-startTime; 
-		passTime = Mathf.Min(passTime, 1.0);
-		var inter : float = Mathf.Sin(passTime/2.0*2*Mathf.PI);
-		var np = Vector4.Lerp(startPos, endPos, inter);
-		object.transform.localPosition = np;
-	}
 	virtual function enter() {
-		
 		enemy = object.enemy;
 		startPos = object.transform.localPosition;
 		endPos = enemy.transform.localPosition;
@@ -26,16 +19,22 @@ class KnightAttack extends StateModel {
 		dir = enemy.transform.localPosition - object.transform.localPosition;
 		object.transform.localRotation = Quaternion.LookRotation(dir);
 	}
-	//knock back enemy position
-	//knock back only belong to knight not belong to others 
 	virtual function exit() {
-		enemy.changeHealth(-object.attack);
+		var dist = object.board.minDistance(object.myGridX, object.myGridZ, enemy.myGridX, enemy.myGridZ);
+		if(dist == 1)
+			enemy.changeHealth(-object.attack);
+		else
+			enemy.changeHealth(-object.attack/2);
+			
 		object.attacking = false;
 		object.transform.localPosition = startPos;
-		
-		Debug.Log("inKnockBack");
-		enemy.knockBacker = object;
-		enemy.inKnockBack = true;
+	}
+	virtual function realUpdate() {
+		var passTime : float = Time.time-startTime; 
+		passTime = Mathf.Min(passTime, 1.0);
+		var inter : float = Mathf.Sin(passTime/2.0*2*Mathf.PI);
+		var np = Vector4.Lerp(startPos, endPos, inter);
+		object.transform.localPosition = np;
 	}
 	function goFree() {
 		var diff : float = Time.time-startTime;

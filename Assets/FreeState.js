@@ -26,12 +26,21 @@ class FreeState extends StateModel {
 	function goDead() {
 		return object.health <= 0;
 	}
+	function goKnockBack() {
+		//Debug.Log("goKnockBack "+object.inKnockBack);
+		return object.inKnockBack;
+	}
+	function goReplace() {
+		return object.inReplace;
+	}
 	virtual function initTransition() {
 		//addTransition("Move", goMove);
 		addTransition("InAttack", goInAttack);
 		addTransition("InChoose", goInChoose);
 		addTransition("Attack", goAttack);
 		addTransition("Dead", goDead);
+		addTransition("KnockBack", goKnockBack);
+		addTransition("Replace", goReplace);
 	}
 	virtual function enter() {
 		startTime = Time.time;

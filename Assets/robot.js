@@ -15,6 +15,7 @@ class robot extends MonoBehaviour {
 	var inAttack : boolean;
 	var inMove : boolean;
 	var attacking : boolean;
+	var inReplace : boolean;
 	
 	//var oldColor : Color;
 	var attackType : int;
@@ -24,6 +25,9 @@ class robot extends MonoBehaviour {
 	var attack : int;
 	var stateMachine : StateMachine;
 	var inDead : boolean;
+	var inKnockBack : boolean;
+	var knockBacker : robot;
+
 
 	function Start () {
 		logic = board.board.GetComponent(ChessBoard);
@@ -34,6 +38,11 @@ class robot extends MonoBehaviour {
 		inAttack = false;
 		inMove = false;
 		inDead = false;
+		inKnockBack = false;
+		inReplace = false;
+		replaceable = false;
+		chooseYet = false;
+		
 		health = 100;
 		attack = 30;
 		initStateMachine();
@@ -45,13 +54,19 @@ class robot extends MonoBehaviour {
 		var move : StateModel = new MoveState(stateMachine, this);
 		stateMachine.addState(move);
 		stateMachine.addState(new InAttack(stateMachine, this));
+		stateMachine.addState(new DeadState(stateMachine, this));
+		stateMachine.addState(new KnockBackState(stateMachine, this));
+		stateMachine.addState(new ReplaceState(stateMachine, this));
 		stateMachine.addState(new InChooseState(stateMachine, this));
 		stateMachine.addState(new AttackState(stateMachine, this));
-		stateMachine.addState(new DeadState(stateMachine, this));
-		stateMachine.initTransition();
-		
-		stateMachine.setCurrentState("Free");
+		initPrivateState();
 	}
+	virtual function initPrivateState() {
+		Debug.Log("robot init Private State");
+		stateMachine.initTransition();
+		stateMachine.setCurrentState("Free");	
+	}
+	
 	function setPosition(row : int, col : int) {
 		transform.localPosition = board.gridToPos(row, col);
 	}
@@ -67,8 +82,10 @@ class robot extends MonoBehaviour {
 		r.attackRange = 1;
 		r.box = b;
 		r.chooseYet = false;
-		r.setMapYet = false;
+		//r.setMapYet = false;
 		r.attackType = 0;
+		//r.initStateMachine();
+		//r.initPrivateState();
 		return r;
 	}
 	function setColor(c) {
@@ -103,6 +120,11 @@ class robot extends MonoBehaviour {
 	function myMouseDown() {
 	}
 	var enemy : robot;
+	var other : robot;
+	function startReplace(o : robot) {
+		other = o;
+		inReplace = true;
+	}
 	function startAttack(enemyObject : robot) {
 		//board.changeChoose();
 		enemy = enemyObject;
@@ -112,7 +134,11 @@ class robot extends MonoBehaviour {
 		//enemyObject.health -= attack;
 	}
 	function myMouseUp() {
-		if(inAttackRange) {
+		if(replaceable) {
+			replacer.startReplace(this);
+			startReplace(replacer);//self replace other replace
+			replaceable = false;
+		} else if(inAttackRange) {
 			attackObject.startAttack(this);
 			inAttackRange = false;
 		} else {
@@ -150,12 +176,12 @@ class robot extends MonoBehaviour {
 		myGridX = grid.x;
 		myGridZ = grid.z;
 		board.updateMap(grid.x, grid.z, this);
-		setMapYet = true;
+		//setMapYet = true;
 	}
 	function clearMap() {
 		var grid : Vector3 = board.posToGrid(transform.localPosition.x, transform.localPosition.z);
 		board.clearMap(grid.x, grid.z, this);
-		setMapYet = false;
+		//setMapYet = false;
 	}
 	function clearAttackable(attacker : robot) {
 		if(inAttackRange && attackObject == attacker) {
@@ -163,11 +189,26 @@ class robot extends MonoBehaviour {
 			attackObject = null;
 		}
 	}
+	var replacer : robot;
+	var replaceable : boolean;
+	function checkReplaceable(from : robot) {
+		if(color == from.color) {
+			replacer = from;
+			replaceable = true;
+		}
+	}
+	function clearReplaceable(from : robot) {
+		if(replaceable && replacer == from) {
+			replacer = null;
+			replaceable = false;
+		}
+	}
+	
 	var inAttackRange : boolean;
 	var attackLayer : GameObject;
 	var attackObject : robot;
 	function checkAttackable(attacker : robot) {
-		Debug.Log("checkAttackble "+attacker.color+" "+color);
+		//Debug.Log("checkAttackble "+attacker.color+" "+color);
 		if(color != attacker.color) {
 			var dist : int = board.minDistance(myGridX, myGridZ, attacker.myGridX, attacker.myGridZ);
 			//Debug.Log("min dist "+dist+" range"+attacker.attackRange);
@@ -241,7 +282,7 @@ class robot extends MonoBehaviour {
 	}
 	
 	
-	var setMapYet : boolean;
+	//var setMapYet : boolean;
 	//in same box
 	function FixedUpdate() {
 		stateMachine.update();
