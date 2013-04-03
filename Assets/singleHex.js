@@ -100,7 +100,7 @@ function Start (){
 	ships.push(rob);
 	rob.updateMap();
 	
-	rob = robot.makeRobot(this);
+	rob = Priest.makeRobot(this);
 	rob.setColor(1);
 	rob.setPosition(4, 3);
 	rob.gameObject.AddComponent(MouseDelegate);

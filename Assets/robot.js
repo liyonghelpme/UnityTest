@@ -1,6 +1,7 @@
 #pragma strict
 //@script RequireComponent(StateMachine)
 class robot extends MonoBehaviour {
+	var attackableList : Array;
 	var color : int;
 	var board : singleHex;
 	var moveRange : int;
@@ -30,6 +31,7 @@ class robot extends MonoBehaviour {
 
 
 	function Start () {
+		attackableList = new Array();
 		logic = board.board.GetComponent(ChessBoard);
 		fontStyle = new GUIStyle();
 		smooth = 5.0;
@@ -45,6 +47,7 @@ class robot extends MonoBehaviour {
 		
 		health = 100;
 		attack = 30;
+		gameObject.tag = "Player";
 		initStateMachine();
 	}
 	virtual function initStateMachine() {
@@ -126,14 +129,12 @@ class robot extends MonoBehaviour {
 		inReplace = true;
 	}
 	function startAttack(enemyObject : robot) {
-		//board.changeChoose();
 		enemy = enemyObject;
 		chooseYet = false;
 		attacking = true;
-		
-		//enemyObject.health -= attack;
 	}
 	function myMouseUp() {
+		 
 		if(replaceable) {
 			replacer.startReplace(this);
 			startReplace(replacer);//self replace other replace
@@ -142,10 +143,7 @@ class robot extends MonoBehaviour {
 			attackObject.startAttack(this);
 			inAttackRange = false;
 		} else {
-			//board.changeChoose();
 			chooseYet = true;
-			//showMoveGrid();
-			//board.shipLayer.BroadcastMessage("checkAttackable", this);
 		}
 	}
 	function myMouseDrag() {
@@ -183,7 +181,14 @@ class robot extends MonoBehaviour {
 		board.clearMap(grid.x, grid.z, this);
 		//setMapYet = false;
 	}
-	function clearAttackable(attacker : robot) {
+	virtual function clearEnemy() {
+		for(var r : robot in attackableList) {
+			r.inAttackRange = false;
+			r.attackObject = null;
+		}
+		attackableList.Clear();
+	}
+	virtual function clearAttackable(attacker : robot) {
 		if(inAttackRange && attackObject == attacker) {
 			inAttackRange = false;
 			attackObject = null;
@@ -201,6 +206,65 @@ class robot extends MonoBehaviour {
 		if(replaceable && replacer == from) {
 			replacer = null;
 			replaceable = false;
+		}
+	}
+	//similar to checkReplacable 
+	//same check different action
+	//distance limit 
+	//find attable enemy change their state in inAttackRange
+	function getAttackable(attacker : robot){
+		if(color != attacker.color) {
+			var dist : int = board.minDistance(myGridX, myGridZ, attacker.myGridX, attacker.myGridZ);
+			//Debug.Log("min dist "+dist+" range"+attacker.attackRange);
+			if(dist <= attacker.attackRange) {
+				var mx : int;
+				var mz : int;
+				var ax : int;
+				var az : int;
+				var arr = new Array();
+				arr.length = 2;
+				
+				board.normalToAffine(myGridX, myGridZ, arr);
+				mx = arr[0];
+				mz = arr[1];
+				board.normalToAffine(attacker.myGridX, attacker.myGridZ, arr);
+				ax = arr[0];
+				az = arr[1];
+				//Debug.Log("affine pos "+mx+" "+mz+" "+ax+" "+az);
+				
+				var path = new Array();
+				var ret : boolean = board.realPathLength(mx, mz, ax, az, path, attacker);
+				//Debug.Log("realPathLength "+ret);
+				if(ret) {
+					inAttackRange = true;
+					attackObject = attacker;
+					//stateMachine.changeState("InAttack");
+				}
+				//Debug.Log("path length "+path.length);
+				//Debug.Log("path is "+path);
+				attackLayer = new GameObject();
+				attackLayer.transform.parent = transform.parent;
+				attackLayer.transform.localPosition = Vector3.zero;
+				
+				
+				for(var c : Array in path) {
+					var hint = GameObject.CreatePrimitive(PrimitiveType.Cube);
+					hint.transform.parent = attackLayer.transform;
+					hint.transform.localScale = Vector3(0.3, 0.3, 0.3);
+					hint.transform.localPosition = board.gridToPos(c[1], c[0]);
+					hint.renderer.material.color = Color.green;
+				}
+				
+				
+			} 
+		}
+		return inAttackRange;
+	}
+	virtual function findAttackable() {
+		for(var r : robot in board.ships) {
+			var ret = r.getAttackable(this);
+			if(ret)
+				attackableList.Push(r);
 		}
 	}
 	

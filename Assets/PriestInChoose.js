@@ -1,7 +1,7 @@
 #pragma strict
-class InChooseState extends StateModel {
+class PriestInChoose extends StateModel {
 	var object : robot;
-	function InChooseState(en : StateMachine, o : robot) {
+	function PriestInChoose	(en : StateMachine, o : robot) {
 		super(en, "InChoose");
 		object = o;
 	}
@@ -9,18 +9,16 @@ class InChooseState extends StateModel {
 		object.board.changeChoose();
 		object.chooseYet = true;
 		object.showMoveGrid();
-		object.board.shipLayer.BroadcastMessage("checkAttackable", object);
-		//object.findAttackable();
+		//object.board.shipLayer.BroadcastMessage("checkCurable", object);
+		object.findAttackable();
 	}
 	virtual function exit() {
 		object.removeMoveGrid();
 		object.box.renderer.material.color.g = 0;
 		object.chooseYet = false;//doMove
 		//doFree clear old choose objects!
-		object.board.shipLayer.BroadcastMessage("clearAttackable", object);//clear my enemy
-		//inform my attackable object clear their state 
-		//object.board.changeChoose();
-		//object.clearAttackable();
+		//object.board.shipLayer.BroadcastMessage("clearCurable", object);//clear my enemy
+		object.clearEnemy();
 	}
 	virtual function realUpdate() {
 		var oldColor = object.box.renderer.material.color;
