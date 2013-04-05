@@ -14,8 +14,8 @@ class FreeState extends StateModel {
 		return object.inAttackRange;
 	}
 	virtual function realUpdate() {
-		var old = object.transform.localPosition;
-		object.transform.localPosition = Vector3(old.x, Mathf.Sin(Time.time-startTime), old.z);
+		//var old = object.transform.localPosition;
+		//object.transform.localPosition = Vector3(old.x, Mathf.Sin(Time.time-startTime), old.z);
 	}
 	function goInChoose() {
 		return object.chooseYet;
@@ -33,6 +33,9 @@ class FreeState extends StateModel {
 	function goReplace() {
 		return object.inReplace;
 	}
+	function goBeAttacked() {
+		return object.beAttacked;
+	}
 	virtual function initTransition() {
 		//addTransition("Move", goMove);
 		addTransition("InAttack", goInAttack);
@@ -41,6 +44,7 @@ class FreeState extends StateModel {
 		addTransition("Dead", goDead);
 		addTransition("KnockBack", goKnockBack);
 		addTransition("Replace", goReplace);
+		addTransition("BeAttacked", goBeAttacked);
 	}
 	virtual function enter() {
 		startTime = Time.time;

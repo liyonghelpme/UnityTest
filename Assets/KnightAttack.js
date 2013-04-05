@@ -29,13 +29,16 @@ class KnightAttack extends StateModel {
 	//knock back enemy position
 	//knock back only belong to knight not belong to others 
 	virtual function exit() {
-		enemy.changeHealth(-object.attack);
+		SoldierModel.calHurt(object, enemy, -object.attack);
 		object.attacking = false;
 		object.transform.localPosition = startPos;
 		
 		Debug.Log("inKnockBack");
-		enemy.knockBacker = object;
-		enemy.inKnockBack = true;
+		//enemy.knockBacker = object;
+		//enemy.inKnockBack = true;
+		enemy.beAttacked = true;
+		var knockBackAction : KnockBackAction = new KnockBackAction(enemy);
+		enemy.setAction("BeAttacked", knockBackAction);
 	}
 	function goFree() {
 		var diff : float = Time.time-startTime;

@@ -82,30 +82,57 @@ function Start (){
 	shipLayer.transform.parent = board.transform;
 	
 	var rob : robot;
-	rob = robot.makeRobot(this);
+	rob = Knight.makeRobot(this);
 	rob.setColor(0);
-	rob.setPosition(4, 4);
-	rob.gameObject.AddComponent(MouseDelegate);
+	rob.setPosition(9, 7);
+	//rob.gameObject.AddComponent(MouseDelegate);
 	
 	rob.transform.parent = shipLayer.transform;
-	//rob.showMoveGrid();
 	ships.push(rob);
 	rob.updateMap();
 	
-	//testBoard();
 	
-	rob = robot.makeRobot(this);
+	rob = Ninja.makeRobot(this);
 	rob.setColor(0);
 	rob.setPosition(11, 10);
-	rob.gameObject.AddComponent(MouseDelegate);
+	//rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();
 	
-	rob = robot.makeRobot(this);
+	rob = Priest.makeRobot(this);
 	rob.setColor(0);
 	rob.setPosition(10, 10);
-	rob.gameObject.AddComponent(MouseDelegate);
+	//rob.gameObject.AddComponent(MouseDelegate);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	rob = Magic.makeRobot(this);
+	rob.setColor(0);
+	rob.setPosition(11, 11);
+	//rob.gameObject.AddComponent(MouseDelegate);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	rob = Archer.makeRobot(this);
+	rob.setColor(0);
+	rob.setPosition(9, 10);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	rob = Flag.makeRobot(this);
+	rob.setColor(0);
+	rob.setPosition(6, 6);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	rob = Flag.makeRobot(this);
+	rob.setColor(1);
+	rob.setPosition(7, 7);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();
@@ -113,8 +140,8 @@ function Start (){
 	
 	rob = Magic.makeRobot(this);
 	rob.setColor(1);
-	rob.setPosition(9, 9);
-	rob.gameObject.AddComponent(MouseDelegate);
+	rob.setPosition(5, 4);
+	//rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();
@@ -122,7 +149,7 @@ function Start (){
 	rob = Priest.makeRobot(this);
 	rob.setColor(1);
 	rob.setPosition(4, 3);
-	rob.gameObject.AddComponent(MouseDelegate);
+	//rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();
@@ -130,7 +157,7 @@ function Start (){
 	rob = Ninja.makeRobot(this);
 	rob.setColor(1);
 	rob.setPosition(3, 3);
-	rob.gameObject.AddComponent(MouseDelegate);
+	//rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();	
@@ -138,7 +165,14 @@ function Start (){
 	rob = Knight.makeRobot(this);
 	rob.setColor(1);
 	rob.setPosition(3, 4);
-	rob.gameObject.AddComponent(MouseDelegate);
+	//rob.gameObject.AddComponent(MouseDelegate);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	rob = Archer.makeRobot(this);
+	rob.setColor(1);
+	rob.setPosition(4, 6);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();

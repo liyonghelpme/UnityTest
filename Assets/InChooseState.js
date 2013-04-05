@@ -1,6 +1,7 @@
 #pragma strict
 class InChooseState extends StateModel {
 	var object : robot;
+	var oldColor : Color;
 	function InChooseState(en : StateMachine, o : robot) {
 		super(en, "InChoose");
 		object = o;
@@ -10,17 +11,19 @@ class InChooseState extends StateModel {
 		object.chooseYet = true;
 		object.showMoveGrid();
 		object.findAttackable();
+		var ret : Array = SoldierModel.getChildColor(object.box);
+		if(ret[0])
+			oldColor = ret[1];
 	}
 	virtual function exit() {
 		object.removeMoveGrid();
-		object.box.renderer.material.color.g = 0;
+		SoldierModel.setChildColor(object.box, oldColor);
 		object.chooseYet = false;//doMove
 		//doFree clear old choose objects!
 		object.clearEnemy();
 	}
 	virtual function realUpdate() {
-		var oldColor = object.box.renderer.material.color;
-		object.box.renderer.material.color = Color(oldColor.r, (Mathf.Sin(Time.time*2*Mathf.PI)+1)/2, oldColor.b);
+		SoldierModel.setChildColor(object.box, Color(oldColor.r, (Mathf.Sin(Time.time*2*Mathf.PI)+1)/2, oldColor.b));
 	}
 	function goFree() {
 		return !object.chooseYet;

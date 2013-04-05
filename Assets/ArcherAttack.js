@@ -1,21 +1,23 @@
 #pragma strict
-class PriestCure extends StateModel {
+class ArcherAttack extends StateModel {
 	var object : robot;
 	var enemy : robot;
 	var startTime : float;
 	var dir : Vector3;
 	var startPos : Vector3;
 	var endPos : Vector3;
-	function PriestCure(en : StateMachine, o : robot) {
+	function ArcherAttack(en : StateMachine, o : robot) {
 		super(en, "Attack");
 		object = o;
 	}
 	virtual function realUpdate() {
+		/*
 		var passTime : float = Time.time-startTime; 
 		passTime = Mathf.Min(passTime, 1.0);
 		var inter : float = Mathf.Sin(passTime/2.0*2*Mathf.PI);
 		var np = Vector4.Lerp(startPos, endPos, inter);
 		object.transform.localPosition = np;
+		*/
 	}
 	virtual function enter() {
 		enemy = object.enemy;
@@ -24,20 +26,14 @@ class PriestCure extends StateModel {
 		startTime = Time.time;
 		dir = enemy.transform.localPosition - object.transform.localPosition;
 		object.transform.localRotation = Quaternion.LookRotation(dir);
-	}
-	//health += attack
-	virtual function exit() {
-		//relive + 1/3 health
-		//priest don't care magicDefense
-		if(enemy.color == object.color) {
-			if(enemy.stateMachine.currentState.stateName == "Dead")
-				enemy.changeHealth(object.attack*2/3);
-			else
-				enemy.changeHealth(object.attack*3);
-		} else {
-			SoldierModel.calHurt(object, enemy, -object.attack);
-		}
 		
+		var arrow = GameObject.Instantiate(Resources.Load("Arrow")) as GameObject;
+		var script : Arrow = arrow.GetComponent(Arrow);
+		script.sol = object;
+		script.target = enemy; 
+		arrow.transform.parent = object.transform.parent;
+	}
+	virtual function exit() {
 		object.attacking = false;
 		object.transform.localPosition = startPos;
 	}

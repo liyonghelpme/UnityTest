@@ -22,9 +22,9 @@ class NinjaAttack extends StateModel {
 	virtual function exit() {
 		var dist = object.board.minDistance(object.myGridX, object.myGridZ, enemy.myGridX, enemy.myGridZ);
 		if(dist == 1)
-			enemy.changeHealth(-object.attack);
-		else
-			enemy.changeHealth(-object.attack/2);
+			SoldierModel.calHurt(object, enemy, -object.attack);
+		else	
+			SoldierModel.calHurt(object, enemy, -object.attack/2);
 			
 		object.attacking = false;
 		object.transform.localPosition = startPos;

@@ -23,8 +23,9 @@ class MagicAttackEnemy extends StateModel {
 		if(attackGlobal.attackList.Count == 2)
 			power = 0.8;
 		else if(attackGlobal.attackList.Count == 3)
-			power = 0.5;
-		attackGlobal.enemy.changeHealth(-object.attack*power);
+			power = 0.6;
+			
+		SoldierModel.calHurt(object, attackGlobal.enemy, -object.attack*power);
 	}
 	virtual function realUpdate() {
 		var passTime : float = Time.time - startTime;

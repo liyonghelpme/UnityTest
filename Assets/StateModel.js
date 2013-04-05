@@ -8,6 +8,7 @@ class StateModel{
 	var initState : StateModel;
 	var stateLevel : int;
 	var parent : StateModel;
+	var action : Action;//
 	
 	function StateModel(s : StateMachine, n : String) {
 		stateMachine = s;
@@ -17,7 +18,12 @@ class StateModel{
 		initState = null;
 		stateLevel = 0;
 		parent = null;
+		action = null;
 	}	
+	virtual function setAction(a : Action) {
+		action = a;
+		action.state = this;
+	}
 	//first child is initState
 	function addChildState(n : String) {
 		var child : StateModel = stateMachine.getState(n);
@@ -30,8 +36,12 @@ class StateModel{
 	}
 	
 	virtual function enter() {
+		if(action != null)
+			action.enter();
 	}
 	virtual function exit() {
+		if(action != null)
+			action.exit();
 	}
 	function update() {
 		for(var t : Transition in transitionArray) {
@@ -40,7 +50,10 @@ class StateModel{
 				return;
 			}
 		}
-		realUpdate();
+		if(action != null) {
+			action.update();
+		} else
+			realUpdate();
 	}
 	virtual function realUpdate() {
 	}

@@ -10,16 +10,19 @@ class InAttack extends StateModel {
 	}
 	virtual function enter()
 	{
-		oldColor = object.box.renderer.material.color;
+		var ret : Array = SoldierModel.getChildColor(object.box);
+		if(ret[0])
+			oldColor = ret[1];
+		//oldColor =  object.box.renderer.material.color;
 		attacker = object.attackObject;
 	}
 	virtual function exit() 
 	{
-		object.box.renderer.material.color = oldColor;
+		SoldierModel.setChildColor(object.box, oldColor);
 	}
 	virtual function realUpdate() {
 		var power = (Mathf.Sin(Time.time*2*Mathf.PI)+1)/2;
-		object.box.renderer.material.color = oldColor*power;
+		SoldierModel.setChildColor(object.box, oldColor*power);
 	}
 	function goFree() {
 		return !object.inAttackRange;

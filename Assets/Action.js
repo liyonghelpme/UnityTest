@@ -1,6 +1,10 @@
 #pragma strict
 class Action {
-	var enter : Function;
-	var update : Function;
-	var exit : Function;
+	var state : StateModel;
+	virtual function enter() {
+	}
+	virtual function exit() {
+	}
+	virtual function update() {
+	}
 }

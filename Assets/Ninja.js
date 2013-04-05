@@ -6,15 +6,20 @@ class Ninja extends robot {
 	
 	static function makeRobot(s : singleHex) {
 		var go = new GameObject();
-		var b = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+		//var b = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+		var b = Instantiate(Resources.Load("Ninja")) as GameObject;
 		b.transform.parent = go.transform;
 		var r = go.AddComponent(Ninja);
 		
 		r.board = s;
-		r.moveRange = 2;
 		r.attackRange = 2;
+		r.moveRange = 3;
 		r.box = b;
-		r.attackType = 2;
+		r.attackType = 0;
+		r.physicDefense = 0;
+		r.magicDefense = 0;
+		r.health = 800;
+		r.attack = 300;
 		return r;
 	}
 	//attack

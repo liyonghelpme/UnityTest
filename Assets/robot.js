@@ -1,5 +1,6 @@
 #pragma strict
-//@script RequireComponent(StateMachine)
+
+@script RequireComponent(BoxCollider)
 class robot extends MonoBehaviour {
 	var attackableList : Array;
 	var color : int;
@@ -26,8 +27,12 @@ class robot extends MonoBehaviour {
 	var attack : int;
 	var stateMachine : StateMachine;
 	var inDead : boolean;
-	var inKnockBack : boolean;
-	var knockBacker : robot;
+	//var inKnockBack : boolean;
+	//var knockBacker : robot;
+	
+	var physicDefense : float;
+	var magicDefense : float;
+	var beAttacked : boolean;
 
 
 	function Start () {
@@ -40,14 +45,18 @@ class robot extends MonoBehaviour {
 		inAttack = false;
 		inMove = false;
 		inDead = false;
-		inKnockBack = false;
+		//inKnockBack = false;
 		inReplace = false;
 		chooseYet = false;
+		beAttacked = false;
 		
-		health = 100;
-		attack = 30;
+		//health = 100;
+		//attack = 30;
 		gameObject.tag = "Player";
 		initStateMachine();
+	
+		var bc : BoxCollider = GetComponent(BoxCollider);
+		bc.center = Vector3(0, 0.5, 0);
 	}
 	virtual function initStateMachine() {
 		stateMachine = new StateMachine();
@@ -61,6 +70,7 @@ class robot extends MonoBehaviour {
 		stateMachine.addState(new ReplaceState(stateMachine, this));
 		stateMachine.addState(new InChooseState(stateMachine, this));
 		stateMachine.addState(new AttackState(stateMachine, this));
+		stateMachine.addState(new BeAttackedState(stateMachine, this));
 		initPrivateState();
 		stateMachine.initTransition();
 		stateMachine.changeState("Free");
@@ -84,15 +94,17 @@ class robot extends MonoBehaviour {
 		r.attackRange = 1;
 		r.box = b;
 		r.attackType = 0;
+		r.physicDefense = 0.2;
+		r.magicDefense = 0.2;
 		return r;
 	}
 	function setColor(c) {
 		color = c;
-		if(color == 0)
-			box.renderer.material.color = Color.red;
-		else
-			box.renderer.material.color = Color.blue;
-		//oldColor = box.renderer.material.color;
+		if(color == 0) {
+			SoldierModel.setChildColor(box, Color.red);
+		}else {
+			SoldierModel.setChildColor(box, Color.blue);
+		}
 	}
 	function changeChoose() {
 		if(chooseYet) {
@@ -116,7 +128,7 @@ class robot extends MonoBehaviour {
 		GUI.Label(Rect(scPos.x, Camera.mainCamera.pixelHeight-scPos.y, 100, 100), ""+health, fontStyle);
 		GUI.Label(Rect(scPos.x, Camera.mainCamera.pixelHeight-scPos.y-40, 100, 100), ""+stateMachine.currentState.stateName, fontStyle);
 	}
-	function myMouseDown() {
+	function OnMouseDown() {
 	}
 	var enemy : robot;
 	var other : robot;
@@ -125,7 +137,7 @@ class robot extends MonoBehaviour {
 		enemy = enemyObject;
 		attacking = true;
 	}
-	function myMouseUp() { 
+	function OnMouseUp() { 
 		if(inAttackRange) {
 			attackObject.startAttack(this);
 			inAttackRange = false;
@@ -133,7 +145,7 @@ class robot extends MonoBehaviour {
 			chooseYet = true;
 		}
 	}
-	function myMouseDrag() {
+	function OnMouseDrag() {
 	}
 	
 	var chooseYet : boolean;
@@ -180,6 +192,9 @@ class robot extends MonoBehaviour {
 			inAttackRange = false;
 			attackObject = null;
 		}
+	}
+	virtual function acceptAttack() {
+		
 	}
 	
 	//similar to checkReplacable 
@@ -447,76 +462,101 @@ class robot extends MonoBehaviour {
 				if(gz % 2 == 0) {
 					nx = gx+1;
 					nz = gz;
-					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						key = nx*1000+nz;
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx;
 					nz = gz+1;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx-1;
 					nz = gz+1;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx-1;
 					nz = gz;
 					key = nx*1000+nz;
+					if(nx < board.width && nz < board.height) {
+
 					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
 						openList.Add([nx, nz, dist+1]);
+					}
 					}
 					nx = gx-1;
 					nz = gz-1;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx;
 					nz = gz-1;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 				} else {
 					nx = gx+1;
 					nz = gz;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx+1;
 					nz = gz+1;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx;
 					nz = gz+1;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx-1;
 					nz = gz;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx;
 					nz = gz-1;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 					nx = gx+1;
 					nz = gz-1;
 					key = nx*1000+nz;
-					if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
-						openList.Add([nx, nz, dist+1]);
+					if(nx < board.width && nz < board.height) {
+						if(board.boardMap[nx*1000+nz] == null && !closedList[key]) {
+							openList.Add([nx, nz, dist+1]);
+						}
 					}
 				}
 			}
@@ -530,5 +570,9 @@ class robot extends MonoBehaviour {
 			health = c;
 		} else
 			health += c;
+	}
+	virtual function setAction(s : String, a : Action) {
+		var state : StateModel = stateMachine.getState(s);
+		state.setAction(a);
 	}
 }

@@ -26,7 +26,7 @@ class AttackState extends StateModel {
 		object.transform.localRotation = Quaternion.LookRotation(dir);
 	}
 	virtual function exit() {
-		enemy.changeHealth(-object.attack);
+		SoldierModel.calHurt(object, enemy, -object.attack);
 		object.attacking = false;
 		object.transform.localPosition = startPos;
 	}

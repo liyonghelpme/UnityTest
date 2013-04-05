@@ -26,7 +26,7 @@ class DeadState extends StateModel {
 			var np : Vector3 = Vector3.Slerp(Vector3.forward, Vector3.up, passTime);
 			var quan : Quaternion = Quaternion.FromToRotation(Vector3.forward, np);
 			object.transform.localRotation = quan;
-			var sz : Vector3 = Vector3.Lerp(Vector3(1, 1, 1), Vector3(1, 1, 0.1), passTime);
+			var sz : Vector3 = Vector3.Lerp(Vector3(1, 1, 1), Vector3(1, 1, 0.5), passTime);
 			object.transform.localScale = sz;
 		}
 	}
