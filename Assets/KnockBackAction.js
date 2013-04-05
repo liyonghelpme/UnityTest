@@ -1,5 +1,6 @@
 #pragma strict
 class KnockBackAction extends Action {
+	var attacker : robot;
 	var object : robot;
 	var startTime : float;
 	var attackerGrid : Vector3;
@@ -7,7 +8,8 @@ class KnockBackAction extends Action {
 	var target : Vector3;
 	var startPos : Vector3;
 	var beAttackState : BeAttackedState;
-	function KnockBackAction(o : robot) {
+	function KnockBackAction(o : robot, a : robot) {
+		attacker = a;
 		object = o;
 		target = object.transform.localPosition;
 	}
@@ -15,7 +17,7 @@ class KnockBackAction extends Action {
 		beAttackState = state as BeAttackedState;
 		beAttackState.finishAni = false;
 		startTime = Time.time;
-		attackerGrid = object.board.posToGrid(object.attackObject.transform.localPosition.x, object.attackObject.transform.localPosition.z);
+		attackerGrid = object.board.posToGrid(attacker.transform.localPosition.x, attacker.transform.localPosition.z);
 		backGrid = object.board.posToGrid(object.transform.localPosition.x, object.transform.localPosition.z);
 		var att : Array = new Array(2);
 		var back : Array = new Array(2);

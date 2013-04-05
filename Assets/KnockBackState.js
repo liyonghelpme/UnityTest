@@ -17,7 +17,7 @@ class KnockBackState extends StateModel {
 	//back + dif 
 	virtual function enter() {
 		startTime = Time.time;
-		attackerGrid = object.board.posToGrid(object.knockBacker.transform.localPosition.x, object.knockBacker.transform.localPosition.z);
+		attackerGrid = object.board.posToGrid(object.attackObject.transform.localPosition.x, object.attackObject.transform.localPosition.z);
 		backGrid = object.board.posToGrid(object.transform.localPosition.x, object.transform.localPosition.z);
 		var att : Array = new Array(2);
 		var back : Array = new Array(2);
@@ -49,7 +49,7 @@ class KnockBackState extends StateModel {
 		Debug.Log("KnockBackState "+startPos+" "+target+" "+back[0]+" "+back[1]);
 	}
 	virtual function exit() {
-		object.inKnockBack = false;
+		//object.inKnockBack = false;
 		object.transform.localPosition = target;
 		object.updateMap();
 	}
