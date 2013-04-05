@@ -22,14 +22,14 @@ class MagicAttackEnemy extends StateModel {
 		var power : float = 1.0;
 		if(attackGlobal.attackList.Count == 2)
 			power = 0.8;
-		else if(attackList.Count == 3)
+		else if(attackGlobal.attackList.Count == 3)
 			power = 0.5;
 		attackGlobal.enemy.changeHealth(-object.attack*power);
 	}
 	virtual function realUpdate() {
 		var passTime : float = Time.time - startTime;
-		passTime = Mathf.Min(1.0, passTime);
-		var np : Vector3 = Vector3.Lerp(startPos, endPos, passTime);
+		passTime = Mathf.Min(0.5, passTime);
+		var np : Vector3 = Vector3.Lerp(startPos, endPos, passTime*2);
 		object.transform.localPosition = np;
 	}
 	function goFind() {
