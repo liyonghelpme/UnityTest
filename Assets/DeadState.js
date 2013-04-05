@@ -2,6 +2,8 @@
 class DeadState extends StateModel {
 	var object : robot;
 	var startTime : float;
+	var oldRotation : Quaternion;
+	var oldScale : Vector3;
 	function DeadState(en : StateMachine, o : robot) {
 		super(en, "Dead");
 		object = o;
@@ -9,9 +11,13 @@ class DeadState extends StateModel {
 	virtual function enter() {
 		object.inDead = true;
 		startTime = Time.time;
+		oldRotation = object.transform.localRotation;
+		oldScale = object.transform.localScale;
 	}
 	virtual function exit() {
 		object.inDead = false;
+		object.transform.localRotation = oldRotation;
+		object.transform.localScale = oldScale;
 	}
 	//become a sphere 
 	virtual function realUpdate() {
@@ -24,7 +30,10 @@ class DeadState extends StateModel {
 			object.transform.localScale = sz;
 		}
 	}
+	function goFree() {
+		return object.health > 0;
+	}
 	virtual function initTransition() {
-		
+		addTransition("Free", goFree);
 	}
 }

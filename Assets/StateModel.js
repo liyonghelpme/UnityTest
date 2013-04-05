@@ -4,11 +4,30 @@ class StateModel{
 	var stateName : String;
 	var transitionArray: Array;
 	var stateMachine : StateMachine; 
+	var childrenState : Array;
+	var initState : StateModel;
+	var stateLevel : int;
+	var parent : StateModel;
+	
 	function StateModel(s : StateMachine, n : String) {
 		stateMachine = s;
 		transitionArray = new Array();
 		stateName = n;
+		childrenState = new Array();
+		initState = null;
+		stateLevel = 0;
+		parent = null;
 	}	
+	//first child is initState
+	function addChildState(n : String) {
+		var child : StateModel = stateMachine.getState(n);
+		if(initState == null) {
+			initState = child;
+		}
+		childrenState.Push(child);
+		child.parent = this;
+		child.stateLevel = stateLevel+1;
+	}
 	
 	virtual function enter() {
 	}
@@ -30,5 +49,7 @@ class StateModel{
 		transitionArray.Push(new Transition(target, trigger));
 	}
 	virtual function initTransition() {
+	}
+	virtual function initChildrenState() {
 	}
 }

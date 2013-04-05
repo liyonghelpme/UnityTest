@@ -4,10 +4,7 @@ class Knight extends robot {
 		super.Start();	
 	}
 	virtual function initPrivateState() {
-		Debug.Log("initPirvateState");
 		stateMachine.addState(new KnightAttack(stateMachine, this));
-		stateMachine.initTransition();
-		stateMachine.setCurrentState("Free");
 	}
 	static function makeRobot(s : singleHex) {
 		var go = new GameObject();

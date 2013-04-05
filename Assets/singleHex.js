@@ -12,14 +12,33 @@ var shipLayer : GameObject;
 
 var boardMap : Hashtable;
 var stateStack : Array;
+var boardGrid : GameObject;
+function updateBoardGrid() {
+	Destroy(boardGrid);
+	boardGrid = new GameObject();
+	boardGrid.transform.parent = board.transform;
+	boardGrid.transform.localPosition = Vector3.zero;
+	for(var i : int in boardMap.Keys) {
+		var nx = i/1000;
+		var nz = i%1000;
+		var g : Vector3 = gridToPos(nz, nx);
+		var h : GameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		h.transform.parent = boardGrid.transform;
+		h.transform.localScale = Vector3(0.5, 0.5, 0.5);
+		h.transform.localPosition = g;
+	}
+}
 function updateMap(x : int, y : int, obj : robot) {
 	boardMap.Add(x*1000+y, obj);
+	updateBoardGrid();
 }
 function clearMap(x : int, y : int, obj : robot) {
 	boardMap.Remove(x*1000+y);
+	updateBoardGrid();
 }
 
 function Start (){
+	boardGrid = new GameObject();
 	stateStack = new Array();
 	ships = new Array();
 	boardMap = new Hashtable();
@@ -76,8 +95,8 @@ function Start (){
 	//testBoard();
 	
 	rob = robot.makeRobot(this);
-	rob.setColor(1);
-	rob.setPosition(6, 6);
+	rob.setColor(0);
+	rob.setPosition(11, 10);
 	rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
@@ -85,16 +104,16 @@ function Start (){
 	
 	rob = robot.makeRobot(this);
 	rob.setColor(0);
-	rob.setPosition(4, 5);
+	rob.setPosition(10, 10);
 	rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();
 	
 	
-	rob = robot.makeRobot(this);
+	rob = Magic.makeRobot(this);
 	rob.setColor(1);
-	rob.setPosition(5, 5);
+	rob.setPosition(9, 9);
 	rob.gameObject.AddComponent(MouseDelegate);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
@@ -124,6 +143,11 @@ function Start (){
 	ships.push(rob);
 	rob.updateMap();
 	
+}
+function clearChoose(){
+	for(var r : robot in ships) {
+		r.changeChoose();
+	}
 }
 //https://groups.google.com/forum/?fromgroups=#!topic/rec.games.design/-5n_Km1SqWc
 function minDistance(x0 : int, y0 : int, x1 : int, y1 : int) {

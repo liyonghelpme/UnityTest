@@ -7,10 +7,12 @@ var startWorldPos : Vector3;
 var startChessPos : Vector3;
 var curTurn : int;
 var showTurnWord : float;
+var logic : singleHex;
 
 
 function Start () {
 	Debug.Log("ChessBoard ");
+	logic = GameObject.Find("GameLogic").GetComponent(singleHex);
 	target = transform.localPosition;
 	smooth = 5.0;
 	plane = new Plane(Vector3.up, Vector3.zero);
@@ -53,6 +55,7 @@ function OnMouseDown() {
 	startChessPos = transform.localPosition; 
 	
 	//Debug.Log("down mouse ");
+	logic.clearChoose();
 }
 function OnMouseUp() {
 	//Debug.Log("OnMouseUp");

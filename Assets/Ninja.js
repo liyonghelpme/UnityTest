@@ -2,9 +2,6 @@
 class Ninja extends robot {
 	virtual function initPrivateState() {
 		stateMachine.addState(new NinjaAttack(stateMachine, this));
-		//stateMachine.addState(new NinjaChoose(stateMachine, this));
-		stateMachine.initTransition();
-		stateMachine.setCurrentState("Free");
 	}
 	
 	static function makeRobot(s : singleHex) {

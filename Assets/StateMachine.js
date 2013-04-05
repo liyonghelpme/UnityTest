@@ -23,14 +23,37 @@ class StateMachine {
 		stateArray.Push(state);
 	}
 	function changeState(nextState : String) {
+		var ns : StateModel = getState(nextState);
 		if(currentState != null) {
 			currentState.exit();
+			exitParentState(currentState, ns.stateLevel);
 			currentState = null;
 		}
 		//Debug.Log("next State "+nextState);
-		currentState = getState(nextState);
+		//currentState = getState(nextState);
+		
+		currentState = getLowestLevelState(ns);
 		currentState.enter();
 	}
+	function exitParentState(cs : StateModel, level : int) {
+		if(cs.parent != null) {
+			if(cs.stateLevel > level) {
+				cs.parent.exit();
+				exitParentState(cs.parent, level);
+			}
+		}
+	}
+	function getLowestLevelState(ns : StateModel) : StateModel {
+		var tempState : StateModel;
+		if(ns.initState != null) {
+			ns.enter();
+			tempState = getLowestLevelState(ns.initState);
+		} else {
+			tempState = ns;
+		}
+		return tempState;
+	}
+	
 	function removeState(n : String) {
 		for(var i = 0; i < stateArray.length; i++) {
 			if((stateArray[i] as StateModel).stateName == n)
@@ -44,13 +67,5 @@ class StateMachine {
 		}
 		return null;
 	}
-	function setCurrentState(s : String) {
-		if(currentState != null) {
-			currentState.exit();
-			currentState = null;
-		}
-		var newState : StateModel = getState(s);
-		currentState = newState;
-		currentState.enter();
-	}
+
 }

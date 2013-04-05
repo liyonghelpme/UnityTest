@@ -27,7 +27,11 @@ class PriestCure extends StateModel {
 	}
 	//health += attack
 	virtual function exit() {
-		enemy.changeHealth(object.attack);
+		//relive + 1/3 health
+		if(enemy.stateMachine.currentState.stateName == "Dead")
+			enemy.changeHealth(object.attack/3);
+		else
+			enemy.changeHealth(object.attack);
 		object.attacking = false;
 		object.transform.localPosition = startPos;
 	}

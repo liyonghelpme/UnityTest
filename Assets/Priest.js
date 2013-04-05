@@ -4,9 +4,6 @@ class Priest extends robot {
 	
 	virtual function initPrivateState() {
 		stateMachine.addState(new PriestCure(stateMachine, this));
-		stateMachine.addState(new PriestInChoose(stateMachine, this));
-		stateMachine.initTransition();
-		stateMachine.setCurrentState("Free");
 	} 
 	static function makeRobot(s : singleHex) {
 		var go = new GameObject();

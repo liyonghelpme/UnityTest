@@ -62,11 +62,11 @@ class robot extends MonoBehaviour {
 		stateMachine.addState(new InChooseState(stateMachine, this));
 		stateMachine.addState(new AttackState(stateMachine, this));
 		initPrivateState();
+		stateMachine.initTransition();
+		stateMachine.changeState("Free");
 	}
 	virtual function initPrivateState() {
 		Debug.Log("robot init Private State");
-		stateMachine.initTransition();
-		stateMachine.setCurrentState("Free");	
 	}
 	
 	function setPosition(row : int, col : int) {
@@ -83,11 +83,7 @@ class robot extends MonoBehaviour {
 		r.moveRange = 2;
 		r.attackRange = 1;
 		r.box = b;
-		r.chooseYet = false;
-		//r.setMapYet = false;
 		r.attackType = 0;
-		//r.initStateMachine();
-		//r.initPrivateState();
 		return r;
 	}
 	function setColor(c) {
@@ -118,6 +114,7 @@ class robot extends MonoBehaviour {
 	function OnGUI() {
 		var scPos : Vector3 = Camera.mainCamera.WorldToScreenPoint(transform.position+Vector3(0, 0.5, 0));
 		GUI.Label(Rect(scPos.x, Camera.mainCamera.pixelHeight-scPos.y, 100, 100), ""+health, fontStyle);
+		GUI.Label(Rect(scPos.x, Camera.mainCamera.pixelHeight-scPos.y-40, 100, 100), ""+stateMachine.currentState.stateName, fontStyle);
 	}
 	function myMouseDown() {
 	}
@@ -279,68 +276,20 @@ class robot extends MonoBehaviour {
 	//in same box
 	function FixedUpdate() {
 		stateMachine.update();
-		/*
-		var dif : Vector3;
-		if(inMove) {
-			if(moveStep >= movePath.length) {
-				inMove = false;
-			} else {
-				//if near target position stop and change target
-				//if not near go to target 
-				var curStep : int = movePath[moveStep];
-				var tempTarget = board.gridToPos(curStep%1000, curStep/1000);
-				dif = tempTarget - transform.localPosition;
-				if(dif.sqrMagnitude > board.s/3) {
-					target = tempTarget;
-				} else {
-					moveStep++;
-				}
-			}
-		}
-		
-		var np : Vector3 = Vector3.Lerp(transform.localPosition, target, Time.deltaTime*smooth);
-		transform.localPosition = np;
-		//not in move status
-		if(!inMove) {
-			if(!setMapYet) {
-				dif = target - transform.localPosition;
-				if(dif.sqrMagnitude <= board.s/3) {
-					setMapYet = true;
-					updateMap();
-				}
-			}
-		}
-		//color shrink
-		if(inAttackRange) {
-			//Debug.Log("inAttackRange "+);
-			var power = (Mathf.Sin(Time.time*2*Mathf.PI)+1)/2;
-			box.renderer.material.color = oldColor*power;
-		}
-		*/
 	}
 	var movePath : Array;
 	//var inMove : boolean;
 	var moveStep : int;
 	function setMoveTarget(tar : MoveGrid) {
+		Debug.Log("setMoveTarget "+tar);
 		var p : Vector3 = tar.gameObject.transform.localPosition;
 		var grid = board.posToGrid(p.x, p.z);
 		var path = findMovePath(grid.x, grid.z);
 		movePath = path;
 		inMove = true;
-		//moveStep = 0;
-		//target = p;
-		//board.changeChoose();
-		//logic.switchTurn();
-		//clearMap();
-		
-		//stateMachine.changeState("Move");
 	}
 	
 	function Update () {
-	
-	}
-	//
-	function findTarget() {
 	
 	}
 	//from current pos to  target pos
@@ -577,6 +526,9 @@ class robot extends MonoBehaviour {
 		return closedList.Keys;
 	}
 	function changeHealth(c : int) {
-		health += c;
+		if(health <= 0 && c > 0) {
+			health = c;
+		} else
+			health += c;
 	}
 }

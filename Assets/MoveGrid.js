@@ -10,14 +10,6 @@ function Start () {
 	var sc : SphereCollider = gameObject.GetComponent(SphereCollider);
 	sc.radius = infoScript.r;
 	sc.center = Vector3.zero;
-	
-	/*
-	var sc : CapsuleCollider = gameObject.GetComponent(CapsuleCollider);
-	sc.radius = infoScript.r;
-	sc.center = Vector3.zero;
-	sc.height = 0.1;
-	sc.direction = 1;
-	*/
 }
 static function makeMoveGrid(hex: GameObject, b : robot) {
 	hex.AddComponent(MoveGrid);
@@ -27,7 +19,15 @@ static function makeMoveGrid(hex: GameObject, b : robot) {
 function OnMouseDrag() {
 }
 function OnMouseUp() {
-	box.setMoveTarget(this);
+	var pos : Vector3 = transform.localPosition;
+	var grid : Array = new Array(0, 0);
+	pos = infoScript.posToGrid(pos.x, pos.z);
+	var gx : int = pos.x;
+	var gz : int = pos.z;
+	if(infoScript.boardMap[gx*1000+gz] == null) {
+		Debug.Log("inMove "+gx+" "+gz);
+		box.setMoveTarget(this);
+	}
 }
 function OnMouseDown() {
 	
