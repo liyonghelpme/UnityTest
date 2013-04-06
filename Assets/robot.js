@@ -17,7 +17,7 @@ class robot extends MonoBehaviour {
 	var inAttack : boolean;
 	var inMove : boolean;
 	var attacking : boolean;
-	var inReplace : boolean;
+	//var inReplace : boolean;
 	
 	//var oldColor : Color;
 	var attackType : int;
@@ -46,7 +46,7 @@ class robot extends MonoBehaviour {
 		inMove = false;
 		inDead = false;
 		//inKnockBack = false;
-		inReplace = false;
+		//inReplace = false;
 		chooseYet = false;
 		beAttacked = false;
 		
@@ -67,7 +67,7 @@ class robot extends MonoBehaviour {
 		stateMachine.addState(new InAttack(stateMachine, this));
 		stateMachine.addState(new DeadState(stateMachine, this));
 		stateMachine.addState(new KnockBackState(stateMachine, this));
-		stateMachine.addState(new ReplaceState(stateMachine, this));
+		//stateMachine.addState(new ReplaceState(stateMachine, this));
 		stateMachine.addState(new InChooseState(stateMachine, this));
 		stateMachine.addState(new AttackState(stateMachine, this));
 		stateMachine.addState(new BeAttackedState(stateMachine, this));
@@ -131,9 +131,10 @@ class robot extends MonoBehaviour {
 	function OnMouseDown() {
 	}
 	var enemy : robot;
-	var other : robot;
+	//var other : robot;
 	
 	virtual function startAttack(enemyObject : robot) {
+		Debug.Log("robot startAttack");
 		enemy = enemyObject;
 		attacking = true;
 	}
@@ -572,7 +573,10 @@ class robot extends MonoBehaviour {
 			health += c;
 	}
 	virtual function setAction(s : String, a : Action) {
+		
 		var state : StateModel = stateMachine.getState(s);
+		Debug.Log("set action "+s+" "+a+" "+state);
 		state.setAction(a);
+		Debug.Log("state action "+state.action);
 	}
 }

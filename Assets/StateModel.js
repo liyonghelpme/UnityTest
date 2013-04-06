@@ -18,9 +18,11 @@ class StateModel{
 		initState = null;
 		stateLevel = 0;
 		parent = null;
-		action = null;
+		action = new Action();
+		Debug.Log("clear State Model");
 	}	
 	virtual function setAction(a : Action) {
+		Debug.Log("setAction "+stateName+" "+a);
 		action = a;
 		action.state = this;
 	}
@@ -36,11 +38,11 @@ class StateModel{
 	}
 	
 	virtual function enter() {
-		if(action != null)
+		if(action.name != "null")
 			action.enter();
 	}
 	virtual function exit() {
-		if(action != null)
+		if(action.name != "null")
 			action.exit();
 	}
 	function update() {
@@ -50,7 +52,7 @@ class StateModel{
 				return;
 			}
 		}
-		if(action != null) {
+		if(action.name != "null") {
 			action.update();
 		} else
 			realUpdate();

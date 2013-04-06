@@ -34,16 +34,32 @@ class Ninja extends robot {
 			}
 		}
 	}
+	
+	//self to self attack
 	virtual function startAttack(enemyObject : robot) {
 		if(enemyObject.color == color) {
-			inReplace = true;
-			other = enemyObject;
+			Debug.Log("startAttacking");
+			//inReplace = true;
+			//other = enemyObject;
+			enemy = enemyObject;
 			
-			enemyObject.inReplace = true;
-			enemyObject.other = this;
+			chooseYet = false;
+			
+			var rn : ReplaceAction = new ReplaceAction(this, enemy);
+			setAction("BeAttacked", rn);
+			beAttacked = true;
+			
+			
+			var rn1 : ReplaceAction = new ReplaceAction(enemy, this);
+			enemy.setAction("BeAttacked", rn1);
+			enemy.beAttacked = true;
+			
+			//enemy.other = this;
+			
 		} else {
 			attacking = true;
 			enemy = enemyObject;
 		}
 	}
+	
 } 

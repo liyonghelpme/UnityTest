@@ -26,9 +26,7 @@ class FreeState extends StateModel {
 	function goDead() {
 		return object.health <= 0;
 	}
-	function goReplace() {
-		return object.inReplace;
-	}
+	
 	function goBeAttacked() {
 		return object.beAttacked;
 	}
@@ -39,7 +37,7 @@ class FreeState extends StateModel {
 		addTransition("Attack", goAttack);
 		addTransition("Dead", goDead);
 		//addTransition("KnockBack", goKnockBack);
-		addTransition("Replace", goReplace);
+		//addTransition("Replace", goReplace);
 		addTransition("BeAttacked", goBeAttacked);
 	}
 	virtual function enter() {

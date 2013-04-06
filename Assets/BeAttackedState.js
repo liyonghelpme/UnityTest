@@ -9,6 +9,7 @@ class BeAttackedState extends StateModel {
 	function BeAttackedState(en : StateMachine, o : robot) {
 		super(en, "BeAttacked");
 		object = o;
+		Debug.Log("call BeAttackedState "+en+" "+o);
 	}
 	virtual function realUpdate() {
 		var diff : float = Time.time - startTime;
@@ -21,7 +22,8 @@ class BeAttackedState extends StateModel {
 		
 	}
 	virtual function enter() {
-		if(action == null) {
+		Debug.Log("BeAttacked enter "+action.name);
+		if(action.name == "null") {
 			finishAni = false;
 			attackObject = object.attackObject;
 			startTime = Time.time;
@@ -31,7 +33,7 @@ class BeAttackedState extends StateModel {
 		}
 	}
 	virtual function exit() {
-		if(action == null) {
+		if(action.name == "null") {
 			object.beAttacked = false;
 		} else {
 			super.exit();

@@ -34,13 +34,14 @@ class InChooseState extends StateModel {
 	function goAttack() {
 		return object.attacking;
 	}
-	function goReplace() {
-		return object.inReplace;
+	function goBeAttacked() {
+		return object.beAttacked;
 	}
 	virtual function initTransition() {
 		addTransition("Free", goFree);
 		addTransition("Move", goMove);
 		addTransition("Attack", goAttack);
-		addTransition("Replace", goReplace);
+		addTransition("BeAttacked", goBeAttacked);
+		//addTransition("Replace", goReplace);
 	}
 }
