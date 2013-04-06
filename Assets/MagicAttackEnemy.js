@@ -26,6 +26,7 @@ class MagicAttackEnemy extends StateModel {
 			power = 0.6;
 			
 		SoldierModel.calHurt(object, attackGlobal.enemy, -object.attack*power);
+		attackGlobal.enemy.beAttacked = true;
 	}
 	virtual function realUpdate() {
 		var passTime : float = Time.time - startTime;

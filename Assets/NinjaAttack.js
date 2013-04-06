@@ -28,6 +28,7 @@ class NinjaAttack extends StateModel {
 			
 		object.attacking = false;
 		object.transform.localPosition = startPos;
+		enemy.beAttacked = true;
 	}
 	virtual function realUpdate() {
 		var passTime : float = Time.time-startTime; 

@@ -18,6 +18,7 @@ function Update () {
 			SoldierModel.calHurt(sol, target, -sol.attack/2);
 		else
 			SoldierModel.calHurt(sol, target, -sol.attack);
+		target.beAttacked = true;
 	}
 	passTime = Mathf.Min(1.0, passTime);
 	var np : Vector3 = Vector3.Lerp(sol.transform.localPosition, target.transform.localPosition, passTime);

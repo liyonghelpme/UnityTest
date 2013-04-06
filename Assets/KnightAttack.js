@@ -36,9 +36,10 @@ class KnightAttack extends StateModel {
 		Debug.Log("inKnockBack");
 		//enemy.knockBacker = object;
 		//enemy.inKnockBack = true;
-		enemy.beAttacked = true;
+		
 		var knockBackAction : KnockBackAction = new KnockBackAction(enemy, object);
 		enemy.setAction("BeAttacked", knockBackAction);
+		enemy.beAttacked = true;
 	}
 	function goFree() {
 		var diff : float = Time.time-startTime;

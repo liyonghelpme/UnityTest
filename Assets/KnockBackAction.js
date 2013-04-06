@@ -9,6 +9,7 @@ class KnockBackAction extends Action {
 	var startPos : Vector3;
 	var beAttackState : BeAttackedState;
 	function KnockBackAction(o : robot, a : robot) {
+		name = "KnockBackAction";
 		attacker = a;
 		object = o;
 		target = object.transform.localPosition;

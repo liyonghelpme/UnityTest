@@ -36,6 +36,7 @@ class PriestCure extends StateModel {
 				enemy.changeHealth(object.attack*3);
 		} else {
 			SoldierModel.calHurt(object, enemy, -object.attack);
+			enemy.beAttacked = true;
 		}
 		
 		object.attacking = false;
