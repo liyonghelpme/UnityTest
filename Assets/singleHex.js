@@ -4,7 +4,7 @@ var h : float;
 var r : float;
 var b : float;
 var a : float;
-var board : GameObject;
+var board : GameObject; 
 var width : int;
 var height: int;
 var ships : Array;
@@ -158,10 +158,26 @@ function Start (){
 	
 	rob = Sniper.makeRobot(this);
 	rob.setColor(0);
-	rob.setPosition(5, 4);
+	rob.setPosition(8, 4);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();
+	
+	rob = Fighter.makeRobot(this);
+	rob.setColor(0);
+	rob.setPosition(8, 5);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	
+	rob = Engineer.makeRobot(this);
+	rob.setColor(0);
+	rob.setPosition(8, 3);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
 	
 	rob = Flag.makeRobot(this);
 	rob.setColor(1);

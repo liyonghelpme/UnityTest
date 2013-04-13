@@ -42,6 +42,9 @@ class AttackState extends StateModel {
 			object.transform.localPosition = startPos;
 		} else
 			action.exit();
+			
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.switchTurn();
 	}
 	function goFree() {
 		return finishAttack;

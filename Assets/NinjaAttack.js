@@ -18,6 +18,9 @@ class NinjaAttack extends StateModel {
 		startTime = Time.time;
 		dir = enemy.transform.localPosition - object.transform.localPosition;
 		object.transform.localRotation = Quaternion.LookRotation(dir);
+		
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.startAction();
 	}
 	virtual function exit() {
 		var dist = object.board.minDistance(object.myGridX, object.myGridZ, enemy.myGridX, enemy.myGridZ);
@@ -29,6 +32,9 @@ class NinjaAttack extends StateModel {
 		object.attacking = false;
 		object.transform.localPosition = startPos;
 		enemy.beAttacked = true;
+		
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.finishAction();
 	}
 	virtual function realUpdate() {
 		var passTime : float = Time.time-startTime; 

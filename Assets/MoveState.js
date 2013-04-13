@@ -4,6 +4,7 @@ class MoveState extends StateModel {
 	var movePath : Array;
 	var moveStep : int;
 	var target : Vector3;
+	var roundManager : RoundManager;
 	
 	
 	function MoveState(en : StateMachine, o : robot) {
@@ -18,6 +19,7 @@ class MoveState extends StateModel {
 	}
 	
 	virtual function enter() {	
+		roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);	
 		movePath = object.movePath;
 		moveStep = 0;
 		target = object.transform.localPosition;
@@ -26,12 +28,14 @@ class MoveState extends StateModel {
 	virtual function exit() {
 		object.updateMap();
 		object.inMove = false;
-		object.logic.switchTurn();
+		//object.logic.switchTurn();
 		var bufferState : PlayerBufferState = object.GetComponent(PlayerBufferState);
 		if(bufferState.hasEffect) {
 			GameObject.FindGameObjectWithTag("ShipLayer").BroadcastMessage("checkSoldierInEffectList", object);
 		}
 		bufferState.updateSoldierInEffectList();
+		
+		roundManager.switchTurn();
 	}
 	virtual function realUpdate() {
 		//if near target position stop and change target

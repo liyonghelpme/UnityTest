@@ -24,6 +24,9 @@ class PriestCure extends StateModel {
 		startTime = Time.time;
 		dir = enemy.transform.localPosition - object.transform.localPosition;
 		object.transform.localRotation = Quaternion.LookRotation(dir);
+		
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.startAction();
 	}
 	//health += attack
 	virtual function exit() {
@@ -41,6 +44,9 @@ class PriestCure extends StateModel {
 		
 		object.attacking = false;
 		object.transform.localPosition = startPos;
+		
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.finishAction();
 	}
 	function goFree() {
 		var diff : float = Time.time-startTime;

@@ -18,6 +18,7 @@ function Start () {
 	plane = new Plane(Vector3.up, Vector3.zero);
 	curTurn = 0;
 }
+/*
 function OnGUI() {
 	if(showTurnWord < 5.0) {
 		var style = new GUIStyle();
@@ -32,10 +33,13 @@ function OnGUI() {
 		showTurnWord += Time.deltaTime;
 	}
 }
+*/
+/*
 function switchTurn() {
 	curTurn = 1-curTurn;
 	showTurnWord = 0;
 }
+*/
 function Update () {
 
 }

@@ -24,7 +24,8 @@ class MagicAttack extends StateModel {
 		enemy = object.enemy;
 		end = false;
 		object.clearMap();
-	
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.startAction();
 	}
 	
 	virtual function exit() {
@@ -32,6 +33,8 @@ class MagicAttack extends StateModel {
 		object.attacking = false;
 		object.updateMap();
 		Debug.Log("exit magic "+originPos);
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.finishAction();
 	}
 	
 	virtual function realUpdate() {

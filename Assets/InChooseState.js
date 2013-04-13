@@ -2,6 +2,7 @@
 class InChooseState extends StateModel {
 	var object : robot;
 	var oldColor : Color;
+	
 	function InChooseState(en : StateMachine, o : robot) {
 		super(en, "InChoose");
 		object = o;

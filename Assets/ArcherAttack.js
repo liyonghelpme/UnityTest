@@ -32,10 +32,15 @@ class ArcherAttack extends StateModel {
 		script.sol = object;
 		script.target = enemy; 
 		arrow.transform.parent = object.transform.parent;
+		
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.startAction();
 	}
 	virtual function exit() {
 		object.attacking = false;
 		object.transform.localPosition = startPos;
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.finishAction();
 	}
 	function goFree() {
 		var diff : float = Time.time-startTime;

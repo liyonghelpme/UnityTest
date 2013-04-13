@@ -3,10 +3,16 @@ class SoldierModel {
 	static function calHurt(att : robot, ene : robot, attack : int) {
 		var inventory : PlayerInventory = ene.gameObject.GetComponent(PlayerInventory);
 		var defense : Vector2 = inventory.doDefense();
-		if(att.attackType == 0) {
-			ene.changeHealth(attack*(1-defense.x));
+		var effect = ene.GetComponent(RobotEffect);
+		if(effect != null) {
+			var ef : RobotEffect = effect;
+			ef.doDefense();
 		} else {
-			ene.changeHealth(attack*(1-defense.y));
+			if(att.attackType == 0) {
+				ene.changeHealth(attack*(1-defense.x));
+			} else {
+				ene.changeHealth(attack*(1-defense.y));
+			}
 		}
 	}
 	static function setChildColor(o : GameObject, c : Color) {
@@ -119,10 +125,14 @@ class SoldierModel {
 	}
 	
 	static function normalToAffine(x : int, y : int, outValue : Array) {
+		x = Mathf.FloorToInt(x);
+		y = Mathf.FloorToInt(y);
 		outValue[0] = x-y/2;
 		outValue[1] = y;
 	}
 	static function affineToNormal(x : int, y : int, outValue : Array) {
+		x = Mathf.FloorToInt(x);
+		y = Mathf.FloorToInt(y);
 		outValue[0] = x+y/2;
 		outValue[1] = y;
 	}

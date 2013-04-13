@@ -9,7 +9,7 @@ class Sniper extends robot {
 		var b : GameObject = Instantiate(Resources.Load("Sniper"));
 		
 		b.transform.parent = go.transform;
-		var r = go.AddComponent(Snipper);
+		var r = go.AddComponent(Sniper);
 		
 		r.board = s;
 		r.moveRange = 2;
@@ -18,8 +18,8 @@ class Sniper extends robot {
 		r.attackType = 0;
 		r.physicDefense = 0.2;
 		r.magicDefense = 0;
-		r.setHealth(1000);
-		r.attack = 200;
+		r.setHealth(800);
+		r.attack = 300;
 		
 		return r;
 	}

@@ -40,6 +40,7 @@ class robot extends MonoBehaviour {
 	var beAttacked : boolean;
 	
 	var inventory : PlayerInventory;
+	var roundManager : RoundManager;
 	
 	function Awake() {
 		var bc : BoxCollider = GetComponent(BoxCollider);
@@ -53,6 +54,8 @@ class robot extends MonoBehaviour {
 	}
 
 	function Start () {
+		roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		
 		attackableList = new Array();
 		logic = board.board.GetComponent(ChessBoard);
 		
@@ -161,6 +164,8 @@ class robot extends MonoBehaviour {
 			attackObject.startAttack(this);
 			inAttackRange = false;
 		} else {
+			if(roundManager.curTurn != color || roundManager.inAction)
+				return;
 			chooseYet = true;
 		}
 	}
@@ -315,6 +320,10 @@ class robot extends MonoBehaviour {
 	//var inMove : boolean;
 	var moveStep : int;
 	function setMoveTarget(tar : MoveGrid) {
+		Debug.Log("set Move ");
+		if(roundManager.curTurn != color || roundManager.inAction)
+			return;
+			
 		Debug.Log("setMoveTarget "+tar);
 		var p : Vector3 = tar.gameObject.transform.localPosition;
 		var grid = board.posToGrid(p.x, p.z);

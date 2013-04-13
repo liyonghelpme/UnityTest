@@ -29,6 +29,9 @@ class SniperAttack extends StateModel {
 		startTime = Time.time;
 		dir = enemy.transform.localPosition - object.transform.localPosition;
 		object.transform.localRotation = Quaternion.LookRotation(dir);
+		
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.startAction();
 	}
 	virtual function exit() {
 		var attack : float = object.doAttack();
@@ -45,19 +48,39 @@ class SniperAttack extends StateModel {
 			object.transform.localPosition = startPos;
 			
 			var frontArray : Array = SoldierModel.getAdjacent(object.myGridX, object.myGridZ, enemy.myGridX, enemy.myGridZ);
-			var n0 : Vector2 = frontArray[0];
-			var n1 : Vector2 = frontArray[1];
-			if(n0 != null) {
-				var r0 : robot = boardMap[Mathf.FloorToInt(n0.x*1000+n0.y)];
-				if(r0 != null)
-					SoldierModel.calHurt(object, enemy, -attack*0.6f);
-			}
-			if(n1 != null) {
-				var r1 : robot = boardMap[Mathf.FloorToInt(n1.x*1000+n1.y)];
-				if(r1 != null)
-					SoldierModel.calHurt(object, enemy, -attack*0.6f);
+			Debug.Log("myGrid "+object.myGridX+" "+object.myGridZ);
+			Debug.Log("eneGrid "+enemy.myGridX+" "+enemy.myGridZ);
+			Debug.Log("find neibor "+frontArray);
+			//affine to normal
+			if(frontArray[0] != null){
+				var n0 : Vector2 = frontArray[0];
+				var n1 : Vector2 = frontArray[1];
+				var norAtt : Array = new Array(0, 0);
+				
+				
+				SoldierModel.affineToNormal(n0.x, n0.y, norAtt);
+				var nx : int = norAtt[0];
+				var nz : int = norAtt[1];
+				Debug.Log("nx nz "+nx+" "+nz);
+				
+				var r0 : robot = boardMap[nx*1000+nz];
+				if(r0 != null && r0.color != object.color)
+					SoldierModel.calHurt(object, r0, -attack*0.6f);
+			
+				SoldierModel.affineToNormal(n1.x, n1.y, norAtt);
+				nx = norAtt[0];
+				nz = norAtt[1];
+				Debug.Log("nx nz "+nx+" "+nz);
+				
+				var r1 : robot = boardMap[nx*1000+nz];
+				if(r1 != null && r1.color != object.color)
+					SoldierModel.calHurt(object, r1, -attack*0.6f);
+			
 			}
 		}
+		
+		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
+		roundManager.finishAction();
 	}
 	
 	

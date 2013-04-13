@@ -1,5 +1,5 @@
 #pragma strict
-class GrenadeAttack extends StateModel {
+class EngineerAttackState extends StateModel {
 	var object : robot;
 	var enemy : robot;
 	var startTime : float;
@@ -9,7 +9,7 @@ class GrenadeAttack extends StateModel {
 	var gameLogic : singleHex;
 	var boardMap : Hashtable;
 	
-	function GrenadeAttack(en : StateMachine, o : robot) {
+	function EngineerAttackState(en : StateMachine, o : robot) {
 		super(en, "Attack");
 		object = o;
 		gameLogic = GameObject.Find("GameLogic").GetComponent(singleHex);
@@ -33,29 +33,19 @@ class GrenadeAttack extends StateModel {
 		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
 		roundManager.startAction();
 	}
+	//knock back enemy position
+	//knock back only belong to knight not belong to others 
 	virtual function exit() {
-		var attack : float = object.doAttack();
-		var dist : int = SoldierModel.minDistance(object.myGridX, object.myGridZ, enemy.myGridX, enemy.myGridZ);
-		if(dist == 1) {
-			SoldierModel.calHurt(object, enemy, -attack*0.7f);
+		if(enemy.color != object.color) {
+			SoldierModel.calHurt(object, enemy, -object.doAttack());
 			object.attacking = false;
 			object.transform.localPosition = startPos;
 		} else {
-			SoldierModel.calHurt(object, enemy, -attack);
+			enemy.gameObject.AddComponent(RobotEffect);
 			object.attacking = false;
 			object.transform.localPosition = startPos;
-			
-			var neibors : Array = SoldierModel.getNeibors(enemy.myGridX, enemy.myGridZ);
-			for(var i : int = 0; i < neibors.length; i += 2) {
-				var nv0 : int = neibors[i];
-				var nv1 : int = neibors[i+1];
-				
-				var ene : robot = boardMap[nv0*1000+nv1];
-				if(ene != null && ene.color != object.color) {
-					SoldierModel.calHurt(object, ene, -attack*.5);
-				}
-			}
 		}
+		
 		var roundManager = GameObject.Find("GameLogic").GetComponent(RoundManager);
 		roundManager.finishAction();
 	}
