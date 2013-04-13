@@ -27,6 +27,11 @@ class MoveState extends StateModel {
 		object.updateMap();
 		object.inMove = false;
 		object.logic.switchTurn();
+		var bufferState : PlayerBufferState = object.GetComponent(PlayerBufferState);
+		if(bufferState.hasEffect) {
+			GameObject.FindGameObjectWithTag("ShipLayer").BroadcastMessage("checkSoldierInEffectList", object);
+		}
+		bufferState.updateSoldierInEffectList();
 	}
 	virtual function realUpdate() {
 		//if near target position stop and change target

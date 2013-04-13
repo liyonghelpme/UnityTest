@@ -25,7 +25,7 @@ class MagicAttackEnemy extends StateModel {
 		else if(attackGlobal.attackList.Count == 3)
 			power = 0.6;
 			
-		SoldierModel.calHurt(object, attackGlobal.enemy, -object.attack*power);
+		SoldierModel.calHurt(object, attackGlobal.enemy, -object.doAttack()*power);
 		attackGlobal.enemy.beAttacked = true;
 	}
 	virtual function realUpdate() {

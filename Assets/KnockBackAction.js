@@ -14,6 +14,7 @@ class KnockBackAction extends Action {
 		object = o;
 		target = object.transform.localPosition;
 	}
+	//attack other other go back one grid
 	virtual function enter() {
 		beAttackState = state as BeAttackedState;
 		beAttackState.finishAni = false;
@@ -53,6 +54,7 @@ class KnockBackAction extends Action {
 		object.beAttacked = false;
 		object.transform.localPosition = target;
 		object.updateMap();
+		object.setAction("BeAttacked", new Action());
 	}
 	virtual function update() {
 		var dif : float = (Time.time - startTime)/1.0;

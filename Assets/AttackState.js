@@ -6,35 +6,45 @@ class AttackState extends StateModel {
 	var dir : Vector3;
 	var startPos : Vector3;
 	var endPos : Vector3;
+	var finishAttack : boolean;
 	function AttackState(en : StateMachine, o : robot) {
 		super(en, "Attack");
 		object = o;
+		finishAttack = false;
 	}
 	virtual function realUpdate() {
 		var passTime : float = Time.time-startTime; 
+		if(passTime >= 1.0f)
+			finishAttack = true;
+			
 		passTime = Mathf.Min(passTime, 1.0);
 		var inter : float = Mathf.Sin(passTime/2.0*2*Mathf.PI);
 		var np = Vector4.Lerp(startPos, endPos, inter);
 		object.transform.localPosition = np;
 	}
 	virtual function enter() {
-		enemy = object.enemy;
-		startPos = object.transform.localPosition;
-		endPos = enemy.transform.localPosition;
-		startTime = Time.time;
-		dir = enemy.transform.localPosition - object.transform.localPosition;
-		object.transform.localRotation = Quaternion.LookRotation(dir);
+		Debug.Log("attack state enter");
+		if(action.name == "null") {
+			finishAttack = false;
+			enemy = object.enemy;
+			startPos = object.transform.localPosition;
+			endPos = enemy.transform.localPosition;
+			startTime = Time.time;
+			dir = enemy.transform.localPosition - object.transform.localPosition;
+			object.transform.localRotation = Quaternion.LookRotation(dir);
+		} else 
+			super.enter();
 	}
 	virtual function exit() {
-		SoldierModel.calHurt(object, enemy, -object.attack);
-		object.attacking = false;
-		object.transform.localPosition = startPos;
+		if(action.name == "null") {
+			SoldierModel.calHurt(object, enemy, -object.doAttack());
+			object.attacking = false;
+			object.transform.localPosition = startPos;
+		} else
+			action.exit();
 	}
 	function goFree() {
-		var diff : float = Time.time-startTime;
-		if(diff >= 1.0)
-			return true;
-		return false;
+		return finishAttack;
 	}
 	virtual function initTransition() {
 		addTransition("Free", goFree);

@@ -29,7 +29,7 @@ class KnightAttack extends StateModel {
 	//knock back enemy position
 	//knock back only belong to knight not belong to others 
 	virtual function exit() {
-		SoldierModel.calHurt(object, enemy, -object.attack);
+		SoldierModel.calHurt(object, enemy, -object.doAttack());
 		object.attacking = false;
 		object.transform.localPosition = startPos;
 		

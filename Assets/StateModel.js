@@ -24,7 +24,8 @@ class StateModel{
 	virtual function setAction(a : Action) {
 		Debug.Log("setAction "+stateName+" "+a);
 		action = a;
-		action.state = this;
+		if(action.name != "null")
+			action.state = this;
 	}
 	//first child is initState
 	function addChildState(n : String) {

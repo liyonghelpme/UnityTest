@@ -13,6 +13,8 @@ var shipLayer : GameObject;
 var boardMap : Hashtable;
 var stateStack : Array;
 var boardGrid : GameObject;
+var stateMachine : StateMachine;
+
 function updateBoardGrid() {
 	Destroy(boardGrid);
 	boardGrid = new GameObject();
@@ -28,6 +30,7 @@ function updateBoardGrid() {
 		h.transform.localPosition = g;
 	}
 }
+
 function updateMap(x : int, y : int, obj : robot) {
 	boardMap.Add(x*1000+y, obj);
 	updateBoardGrid();
@@ -37,7 +40,28 @@ function clearMap(x : int, y : int, obj : robot) {
 	updateBoardGrid();
 }
 
-function Start (){
+function initStateMachine() {
+	stateMachine.addState(new GameStart(stateMachine, this));
+	stateMachine.initTransition();
+	stateMachine.changeState("GameStart");
+}
+var start : boolean;
+var mySkin : GUISkin;
+function OnGUI() {
+	if(stateMachine.currentState.stateName == "GameStart") {
+		GUI.skin = mySkin;
+		GUILayout.ExpandWidth(false);
+		if(GUILayout.Button("PlayGameNow")) {
+			start = true;
+		}
+	} else if(stateMachine.currentState.stateName == "GameGoing") {
+	}
+}
+function Awake() {
+	stateMachine = new StateMachine();
+	initStateMachine();
+	start = false;
+	
 	boardGrid = new GameObject();
 	stateStack = new Array();
 	ships = new Array();
@@ -51,7 +75,8 @@ function Start (){
 	board = new GameObject();
 	width = 13;
 	height = 13;
-	
+}
+function Start (){
 	//var colObj = new GameObject();
 	//colObj.transform.parent = board.transform;
 	//colObj.transform.localPosition = Vector3.zero;
@@ -79,6 +104,7 @@ function Start (){
 	
 	shipLayer = new GameObject();
 	shipLayer.name = "shipLayer";
+	shipLayer.tag = "ShipLayer";
 	shipLayer.transform.parent = board.transform;
 	
 	var rob : robot;
@@ -130,9 +156,23 @@ function Start (){
 	ships.push(rob);
 	rob.updateMap();
 	
+	rob = Sniper.makeRobot(this);
+	rob.setColor(0);
+	rob.setPosition(5, 4);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
 	rob = Flag.makeRobot(this);
 	rob.setColor(1);
 	rob.setPosition(7, 7);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	rob = Grenade.makeRobot(this);
+	rob.setColor(1);
+	rob.setPosition(7, 9);
 	rob.transform.parent = shipLayer.transform;
 	ships.push(rob);
 	rob.updateMap();
@@ -177,6 +217,18 @@ function Start (){
 	ships.push(rob);
 	rob.updateMap();
 	
+	
+	
+	rob = Paladin.makeRobot(this);
+	rob.setColor(1);
+	rob.setPosition(4, 5);
+	rob.transform.parent = shipLayer.transform;
+	ships.push(rob);
+	rob.updateMap();
+	
+	//after all soldier initial
+	//broadcast other check state
+	shipLayer.BroadcastMessage("checkSoldierInEffectList", rob);
 }
 function clearChoose(){
 	for(var r : robot in ships) {
@@ -338,16 +390,8 @@ function realPathLength(x0 : int, y0 : int, x1 : int, y1 : int, path : Array, at
 	return false;
 }
 
-
-
-function update() {
-
-}
-
 //move  
-function FixedUpdate() {
-	
-}
+
 
 function changeChoose() {
 	shipLayer.BroadcastMessage("changeChoose");
@@ -470,4 +514,6 @@ function Update () {
 	if(Physics.Raycast(ray)) {
 		Debug.DrawRay(ray.origin, ray.direction*20, Color.red, 0.3);
 	}
+	
+	stateMachine.update();
 }

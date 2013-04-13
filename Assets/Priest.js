@@ -19,7 +19,7 @@ class Priest extends robot {
 		r.attackType = 1;
 		r.physicDefense = 0;
 		r.magicDefense = 0;
-		r.health = 800;
+		r.setHealth(800);
 		r.attack = 200;
 		return r;
 	}

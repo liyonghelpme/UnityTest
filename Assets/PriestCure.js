@@ -31,11 +31,11 @@ class PriestCure extends StateModel {
 		//priest don't care magicDefense
 		if(enemy.color == object.color) {
 			if(enemy.stateMachine.currentState.stateName == "Dead")
-				enemy.changeHealth(object.attack*2/3);
+				enemy.changeHealth(object.doAttack()*2/3);
 			else
-				enemy.changeHealth(object.attack*3);
+				enemy.changeHealth(object.doAttack()*3);
 		} else {
-			SoldierModel.calHurt(object, enemy, -object.attack);
+			SoldierModel.calHurt(object, enemy, -object.doAttack());
 			enemy.beAttacked = true;
 		}
 		

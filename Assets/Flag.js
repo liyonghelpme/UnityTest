@@ -15,7 +15,7 @@ class Flag extends robot {
 		r.attackType = 0;
 		r.physicDefense = 0;
 		r.magicDefense = 0;
-		r.health = 800;
+		r.setHealth(800);
 		r.attack = 0;
 		return r;
 	}

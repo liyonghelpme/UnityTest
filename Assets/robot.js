@@ -1,6 +1,10 @@
 #pragma strict
 
 @script RequireComponent(BoxCollider)
+@script RequireComponent(PlayerInventory)
+@script RequireComponent(Rigidbody)
+@script RequireComponent(PlayerState)
+@script RequireComponent(PlayerBufferState)
 class robot extends MonoBehaviour {
 	var attackableList : Array;
 	var color : int;
@@ -22,6 +26,7 @@ class robot extends MonoBehaviour {
 	//var oldColor : Color;
 	var attackType : int;
 	
+	var baseHealth : int;
 	//show number 
 	var health : int;
 	var attack : int;
@@ -33,12 +38,24 @@ class robot extends MonoBehaviour {
 	var physicDefense : float;
 	var magicDefense : float;
 	var beAttacked : boolean;
-
+	
+	var inventory : PlayerInventory;
+	
+	function Awake() {
+		var bc : BoxCollider = GetComponent(BoxCollider);
+		bc.center = Vector3(0, 0.5, 0);
+		var rb : Rigidbody = GetComponent(Rigidbody);
+		//rb.freezeRotation = true;
+		rb.constraints = RigidbodyConstraints.FreezeAll;
+		
+		inventory = GetComponent(PlayerInventory);
+		GetComponent(PlayerBufferState).mainRobot = this;
+	}
 
 	function Start () {
 		attackableList = new Array();
 		logic = board.board.GetComponent(ChessBoard);
-		fontStyle = new GUIStyle();
+		
 		smooth = 5.0;
 		//target = transform.localPosition;
 		inAttackRange = false;
@@ -54,9 +71,8 @@ class robot extends MonoBehaviour {
 		//attack = 30;
 		gameObject.tag = "Player";
 		initStateMachine();
-	
-		var bc : BoxCollider = GetComponent(BoxCollider);
-		bc.center = Vector3(0, 0.5, 0);
+		baseHealth = 800;
+		
 	}
 	virtual function initStateMachine() {
 		stateMachine = new StateMachine();
@@ -78,9 +94,15 @@ class robot extends MonoBehaviour {
 	virtual function initPrivateState() {
 		Debug.Log("robot init Private State");
 	}
-	
+	function doAttack() : float {
+		return inventory.doAttack();
+	}
 	function setPosition(row : int, col : int) {
 		transform.localPosition = board.gridToPos(row, col);
+	}
+	function setHealth(h : int) {
+		health = h;
+		baseHealth = h;
 	}
 	static function makeRobot(s : singleHex) {
 		var go = new GameObject();
@@ -122,12 +144,8 @@ class robot extends MonoBehaviour {
 			attackLayer = null;
 		}
 	}
-	var fontStyle : GUIStyle;
-	function OnGUI() {
-		var scPos : Vector3 = Camera.mainCamera.WorldToScreenPoint(transform.position+Vector3(0, 0.5, 0));
-		GUI.Label(Rect(scPos.x, Camera.mainCamera.pixelHeight-scPos.y, 100, 100), ""+health, fontStyle);
-		GUI.Label(Rect(scPos.x, Camera.mainCamera.pixelHeight-scPos.y-40, 100, 100), ""+stateMachine.currentState.stateName, fontStyle);
-	}
+	
+	
 	function OnMouseDown() {
 	}
 	var enemy : robot;
@@ -269,7 +287,7 @@ class robot extends MonoBehaviour {
 		moveGrid.transform.parent = transform.parent;
 		moveGrid.transform.localPosition = Vector3.zero;
 		var hex : GameObject;
-		var points = findMoveOrAttackPoints(moveRange);
+		var points = findMoveOrAttackPoints(inventory.getMoveDistance());
 		Debug.Log("move point num "+points);
 		var temp = new Array(points);
 		Debug.Log("array "+temp);
@@ -290,7 +308,7 @@ class robot extends MonoBehaviour {
 	
 	//var setMapYet : boolean;
 	//in same box
-	function FixedUpdate() {
+	function Update() {
 		stateMachine.update();
 	}
 	var movePath : Array;
@@ -303,11 +321,9 @@ class robot extends MonoBehaviour {
 		var path = findMovePath(grid.x, grid.z);
 		movePath = path;
 		inMove = true;
+		inventory.doMoveDistance();
 	}
 	
-	function Update () {
-	
-	}
 	//from current pos to  target pos
 	//gridInfo  key ----> [parent, dist]
 	function findMovePath(tarX : int, tarZ : int) {
@@ -333,7 +349,7 @@ class robot extends MonoBehaviour {
 			dist = pos[2];
 			var key : int;
 			var parent : int = gx*1000+gz;
-			if(dist < moveRange) {
+			if(dist < inventory.getMoveDistance()) {
 				//check neibor and add neibor
 				if(gz % 2 == 0) {
 					nx = gx+1;

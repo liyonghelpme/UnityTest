@@ -15,9 +15,9 @@ function Update () {
 		Destroy(gameObject);
 		var dist : float = sol.board.minDistance(sol.myGridX, sol.myGridZ, target.myGridX, target.myGridZ);
 		if(dist == 1)
-			SoldierModel.calHurt(sol, target, -sol.attack/2);
+			SoldierModel.calHurt(sol, target, -sol.doAttack()/2);
 		else
-			SoldierModel.calHurt(sol, target, -sol.attack);
+			SoldierModel.calHurt(sol, target, -sol.doAttack());
 		target.beAttacked = true;
 	}
 	passTime = Mathf.Min(1.0, passTime);
